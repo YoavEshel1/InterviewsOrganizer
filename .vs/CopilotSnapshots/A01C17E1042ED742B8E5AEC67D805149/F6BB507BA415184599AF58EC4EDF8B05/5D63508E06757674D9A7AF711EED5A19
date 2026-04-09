@@ -1,0 +1,10 @@
+﻿namespace InterviewsOrganizer.Models.Enums
+{
+    enum InterviewStatus
+    {
+        Applied,
+        InProgress,
+        Passed,
+        Failed
+    }
+}

@@ -1,0 +1,7 @@
+﻿namespace InterviewsOrganizer.Models.DTOs
+{
+    class CreateInterviewDto
+    {
+        public DateTime Date { get; set; }
+    }
+}

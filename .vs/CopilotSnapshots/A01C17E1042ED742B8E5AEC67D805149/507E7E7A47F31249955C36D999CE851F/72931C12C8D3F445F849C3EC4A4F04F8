@@ -1,0 +1,13 @@
+﻿using InterviewsOrganizer.Models.DTOs;
+using InterviewsOrganizer.Models.Entities;
+using InterviewsOrganizer.Models.Enums;
+
+namespace InterviewsOrganizer.Services.Interfaces
+{
+    interface IInterviewService
+    {
+        Task Create(CreateInterviewDto dto);
+        Task<List<Interview>> GetAll();
+        Task UpdateStatus(Guid id, InterviewStatus status);
+    }
+}
