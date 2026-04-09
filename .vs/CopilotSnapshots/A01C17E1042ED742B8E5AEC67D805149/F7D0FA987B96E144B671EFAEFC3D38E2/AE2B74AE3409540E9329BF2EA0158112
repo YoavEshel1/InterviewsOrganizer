@@ -1,9 +1,0 @@
-﻿using InterviewsOrganizer.Models.Enums;
-
-namespace InterviewsOrganizer.Models.DTOs
-{
-    class UpdateStatusDto
-    {
-        public InterviewStatus Status { get; set; }
-    }
-}
