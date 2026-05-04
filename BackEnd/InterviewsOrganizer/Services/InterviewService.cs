@@ -1,52 +1,39 @@
-﻿using InterviewsOrganizer.Models.DTOs;
-using InterviewsOrganizer.Models.Entities;
-using InterviewsOrganizer.Models.Enums;
+﻿using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Repositories.Interfaces;
 using InterviewsOrganizer.Services.Interfaces;
+
 
 namespace InterviewsOrganizer.Services
 {
     public class InterviewService : IInterviewService
     {
-        private readonly IInterviewRepository _repo;
+        private readonly IInterviewRepository _interviewRepository;
 
-        public InterviewService(IInterviewRepository repo)
+        public InterviewService(IInterviewRepository interviewRepository)
         {
-            _repo = repo;
+            _interviewRepository = interviewRepository;
         }
 
-        public async Task Create(CreateInterviewDto dto)
+        public async Task<List<Interview>> GetAllAsync(Guid positionId) =>
+            await _interviewRepository.GetAll(positionId);
+
+        public async Task<Interview?> GetByIdAsync(Guid id) =>
+            await _interviewRepository.GetById(id);
+
+        public async Task CreateAsync(Interview interview, Guid positionId)
         {
-            if (dto.Date < DateTime.Now)
-                throw new Exception("Date must be in the future");
-
-            var interview = new Interview
-            {
-                Id = Guid.NewGuid(),
-                Date = dto.Date,
-                Status = InterviewStatus.Applied,
-                CompanyName = dto.CompanyName
-            };
-
-            await _repo.Add(interview);
-            await _repo.Save();
+            await _interviewRepository.Add(interview, positionId);
+            await _interviewRepository.Save();
         }
 
-        public async Task<List<Interview>> GetAll()
+        public async Task<bool> DeleteAsync(Guid id)
         {
-            return await _repo.GetAll();
-        }
-
-        public async Task UpdateStatus(Guid id, InterviewStatus status)
-        {
-            var interview = await _repo.GetById(id);
-
-            if (interview.Status == InterviewStatus.Failed)
-                throw new Exception("Cannot change status");
-
-            interview.Status = status;
-
-            await _repo.Save();
+            var interview = await _interviewRepository.GetById(id);
+            if (interview is null) return false;
+            // Add Delete to repository if needed
+            return false;
         }
     }
 }
+
+

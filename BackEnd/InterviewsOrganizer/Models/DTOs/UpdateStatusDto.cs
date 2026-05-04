@@ -4,6 +4,6 @@ namespace InterviewsOrganizer.Models.DTOs
 {
     public class UpdateStatusDto
     {
-        public InterviewStatus Status { get; set; }
+        public PositionStatus Status { get; set; }
     }
 }

@@ -14,14 +14,17 @@ namespace InterviewsOrganizer.Repositories
             _context = context;
         }
 
-        public async Task Add(Interview interview)
+        public async Task Add(Interview interview, Guid positionId)
         {
+            interview.PositionId = positionId;
             await _context.Interviews.AddAsync(interview);
         }
 
-        public async Task<List<Interview>> GetAll()
+        public async Task<List<Interview>> GetAll(Guid positionId)
         {
-            return await _context.Interviews.ToListAsync();
+            return await _context.Interviews
+                .Where(i => i.PositionId == positionId)
+                .ToListAsync();
         }
 
         public async Task<Interview?> GetById(Guid id)

@@ -1,13 +1,12 @@
-﻿using InterviewsOrganizer.Models.DTOs;
-using InterviewsOrganizer.Models.Entities;
-using InterviewsOrganizer.Models.Enums;
+﻿using InterviewsOrganizer.Models.Entities;
 
 namespace InterviewsOrganizer.Services.Interfaces
 {
-    public interface IInterviewService
+    public interface IInterviewService  
     {
-        Task Create(CreateInterviewDto dto);
-        Task<List<Interview>> GetAll();
-        Task UpdateStatus(Guid id, InterviewStatus status);
+        Task<List<Interview>> GetAllAsync(Guid positionId);
+        Task<Interview?> GetByIdAsync(Guid id);
+        Task CreateAsync(Interview interview, Guid positionId);
+        Task<bool> DeleteAsync(Guid id);
     }
 }

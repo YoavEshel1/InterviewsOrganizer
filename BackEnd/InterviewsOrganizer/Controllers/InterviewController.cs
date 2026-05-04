@@ -1,11 +1,12 @@
 ﻿using InterviewsOrganizer.Models.DTOs;
+using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InterviewsOrganizer.Controllers
 {
     [ApiController]
-    [Route("api/interviews")]
+    [Route("api/positions/{positionId}/interviews")]
     public class InterviewController : ControllerBase
     {
         private readonly IInterviewService _service;
@@ -15,25 +16,41 @@ namespace InterviewsOrganizer.Controllers
             _service = service;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(CreateInterviewDto dto)
-        {
-            await _service.Create(dto);
-            return Ok();
-        }
-
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(Guid positionId)
         {
-            var data = await _service.GetAll();
+            var data = await _service.GetAllAsync(positionId);
             return Ok(data);
         }
 
-        [HttpPut("{id}/status")]
-        public async Task<IActionResult> UpdateStatus(Guid id, UpdateStatusDto dto)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
         {
-            await _service.UpdateStatus(id, dto.Status);
-            return Ok();
+            var interview = await _service.GetByIdAsync(id);
+            if (interview is null) return NotFound();
+            return Ok(interview);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(Guid positionId, CreateInterviewDto dto)
+        {
+            var interview = new Interview
+            {
+                Date = dto.Date,
+                Feeling = dto.Feeling,
+                Interviewer = dto.Interviewer,
+                Notes = dto.Notes
+            };
+            await _service.CreateAsync(interview, positionId);
+            return CreatedAtAction(nameof(GetById), new { positionId, id = interview.Id }, interview);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await _service.DeleteAsync(id);
+            if (!result) return NotFound();
+            return NoContent();
         }
     }
 }

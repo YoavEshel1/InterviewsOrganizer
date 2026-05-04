@@ -1,6 +1,6 @@
 ﻿namespace InterviewsOrganizer.Models.Enums
 {
-    public enum InterviewStatus
+    public enum PositionStatus
     {
         Applied,
         InProgress,
