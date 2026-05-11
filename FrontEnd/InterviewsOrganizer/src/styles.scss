@@ -1,0 +1,51 @@
+/* You can add global styles to this file, and also import other style files */
+
+// ─── Color Palette ───────────────────────────────────────────────────────────
+:root {
+  // Brand
+  --color-primary:        #1a73e8;   // primary actions, links, active states
+  --color-primary-dark:   #1558b0;   // hover/focus on primary
+  --color-primary-light:  #d2e3fc;   // subtle highlights, badges
+
+  // Surface / Layout
+  --color-bg:             #f5f7fa;   // page background
+  --color-surface:        #ffffff;   // cards, panels, dialogs
+  --color-surface-raised: #eef1f6;   // hover rows, secondary panels
+
+  // Borders & Dividers
+  --color-border:         #dce1e9;   // default border/divider
+  --color-border-strong:  #b0b8c4;   // emphasized borders
+
+  // Text
+  --color-text-primary:   #1c2b3a;   // headings, primary content
+  --color-text-secondary: #5a6a7a;   // labels, captions
+  --color-text-disabled:  #9aaab8;   // disabled / placeholder
+
+  // Semantic / Status
+  --color-success:        #2e7d32;
+  --color-success-light:  #e8f5e9;
+  --color-warning:        #e65100;
+  --color-warning-light:  #fff3e0;
+  --color-error:          #c62828;
+  --color-error-light:    #ffebee;
+  --color-info:           #0277bd;
+  --color-info-light:     #e1f5fe;
+
+  // Header / Footer chrome
+  --color-chrome-bg:      #ffffff;
+  --color-chrome-border:  #dce1e9;
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+}

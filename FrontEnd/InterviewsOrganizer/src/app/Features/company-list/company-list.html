@@ -1,0 +1,11 @@
+<div class="container">
+    @if (loadingCompanies()) {
+    <p>Loading companies...</p>
+    } @else {
+    <div cdkDropList class="example-list" (cdkDropListDropped)="drop($event)">
+        @for (company of companies(); track company.id) {
+         <app-company-item [company]="company"></app-company-item>
+        }
+    </div>
+    }
+</div>          

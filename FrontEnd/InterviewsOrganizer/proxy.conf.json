@@ -1,0 +1,20 @@
+{
+  "/api": {
+    "target": "https://localhost:7121/",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": "/api"
+    }
+  },
+  "/socket.io": {
+    "target": "https://localhost:7121/",
+    "secure": false,
+    "logLevel": "debug",
+    "changeOrigin": true,
+    "ws": true,
+    "timeout": 60000,
+    "proxyTimeout": 60000
+  }
+}
