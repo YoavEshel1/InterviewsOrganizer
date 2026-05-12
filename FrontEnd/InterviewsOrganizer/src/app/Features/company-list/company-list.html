@@ -2,9 +2,9 @@
     @if (loadingCompanies()) {
     <p>Loading companies...</p>
     } @else {
-    <div cdkDropList class="example-list" (cdkDropListDropped)="drop($event)">
+    <div cdkDropList class="company-list" (cdkDropListDropped)="drop($event)">
         @for (company of companies(); track company.id) {
-         <app-company-item [company]="company"></app-company-item>
+         <app-company-item [company]="company" class="company-box"></app-company-item>
         }
     </div>
     }

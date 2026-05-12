@@ -1,4 +1,7 @@
 <div class="item" cdkDrag>
-    <div>{{ company.name }}</div>
+    <div><b>{{ company.name }}</b></div>
+    <div>{{ company.positions && company.positions.length ?
+     company.positions[0]?.title : 'No positions defined' }}
+    </div>
     <div>{{ company.companyInfo }}</div>
 </div>

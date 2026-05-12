@@ -4,5 +4,5 @@ export interface Company {
     id : string; 
     name: string;
     companyInfo?: string;    
-    interviews: Position[];    
+    positions: Position[];    
 }

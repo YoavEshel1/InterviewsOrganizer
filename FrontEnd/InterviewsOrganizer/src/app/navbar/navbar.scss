@@ -1,6 +1,15 @@
-.navbar-nav {
-  display:flex;
+.navbar-nav { //the ul tag in the navbar component
+  display: flex;
   flex-direction: row;
+  gap: 20px;
+  list-style: none;
+  padding-left: 0;
+
+ //li tag in the navbar component can be added here if needed for styling
+ li {
+  //font-weight: 900;
+ }
+  
 }
 
 .nav-link {
@@ -9,7 +18,7 @@
 }
 
 .navbar-light .navbar-nav .nav-link.active {
-  color: #007ACC
+  color: var(--color-primary);
 }
 
 .navbar-brand {

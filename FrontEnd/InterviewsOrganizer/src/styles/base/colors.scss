@@ -1,6 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
-
 // ─── Color Palette ───────────────────────────────────────────────────────────
+// All color definitions for the application.
+// Use var(--color-*) in any component or global SCSS file.
 :root {
   // Brand
   --color-primary:        #1a73e8;   // primary actions, links, active states
@@ -36,16 +36,3 @@
   --color-chrome-border:  #dce1e9;
 }
 // ─────────────────────────────────────────────────────────────────────────────
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--color-bg);
-  color: var(--color-text-primary);
-}
