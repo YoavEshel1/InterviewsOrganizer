@@ -1,0 +1,34 @@
+<div class="wrapper">
+    <div class="instructions-row">
+        <div>Manage company details, positions, and interview history.</div>
+        <div class="top-buttons">
+            <button class="btn btn--ghost" (click)="cancel()">Cancel</button>
+            <button class="btn btn--primary" (click)="saveChanges()">Save Changes</button>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Company Details Form -->
+    <div class="company-details">
+        <h2>Company Details</h2>
+        <form [formGroup]="form" (ngSubmit)="saveChanges()">
+            <div class="form-group">
+                <div>
+                    <label for="companyName">Company Name</label>
+                    <input type="text" id="companyName" name="companyName" class="form-control" formControlName="name"
+                        placeholder="Company name">
+                    @if (isInvalid('name')) {
+                    <span class="cf-error">Company name is required</span>
+                    }
+
+                </div>
+                <div>
+                    <label for="company-info">Company Info</label>
+                    <textarea id="company-info" name="company-info" class="form-control" formControlName="companyInfo"
+                        placeholder="Company info"></textarea>
+                </div>
+
+            </div>
+        </form>
+    </div>
