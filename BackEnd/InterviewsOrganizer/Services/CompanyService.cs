@@ -13,10 +13,10 @@ namespace InterviewsOrganizer.Services
             _companyRepository = companyRepository;
         }
 
-        public async Task<List<Company>> GetAllAsync() =>
+        public async Task<List<Company>> GetAllAsync(CancellationToken cancellationToken = default) =>
             await _companyRepository.GetAll();
 
-        public async Task<Company?> GetByIdAsync(Guid id) =>
+        public async Task<Company?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
             await _companyRepository.GetById(id);
 
         public async Task CreateAsync(Company company)

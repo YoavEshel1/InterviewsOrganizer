@@ -1,6 +1,7 @@
 using InterviewsOrganizer.Models.DTOs;
 using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Services.Interfaces;
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InterviewsOrganizer.Controllers
@@ -17,16 +18,19 @@ namespace InterviewsOrganizer.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [RequestTimeout(120000)] // 2 minutes in milliseconds
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
-            var data = await _service.GetAllAsync();
+           
+            var data = await _service.GetAllAsync(cancellationToken);
             return Ok(data);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(Guid id)
+        [RequestTimeout(120000)] // 2 minutes in milliseconds
+        public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
-            var company = await _service.GetByIdAsync(id);
+            var company = await _service.GetByIdAsync(id, cancellationToken);
             if (company is null) return NotFound();
             return Ok(company);
         }

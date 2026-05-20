@@ -19,14 +19,14 @@ namespace InterviewsOrganizer.Repositories
             await _context.Companies.AddAsync(company);
         }
 
-        public async Task<List<Company>> GetAll()
+        public async Task<List<Company>> GetAll(CancellationToken cancellationToken = default)
         {
-            return await _context.Companies.ToListAsync();
+            return await _context.Companies.ToListAsync(cancellationToken);
         }
 
-        public async Task<Company?> GetById(Guid id)
+        public async Task<Company?> GetById(Guid id, CancellationToken cancellationToken = default)
         {
-            return await _context.Companies.FindAsync(id);
+            return await _context.Companies.FindAsync(id, cancellationToken);
         }
 
         public async Task Save()
