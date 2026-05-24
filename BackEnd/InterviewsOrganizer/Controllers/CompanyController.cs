@@ -1,6 +1,7 @@
 using InterviewsOrganizer.Models.DTOs;
 using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,7 @@ namespace InterviewsOrganizer.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         [RequestTimeout(120000)] // 2 minutes in milliseconds
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
@@ -27,6 +29,7 @@ namespace InterviewsOrganizer.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         [RequestTimeout(120000)] // 2 minutes in milliseconds
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
@@ -36,6 +39,7 @@ namespace InterviewsOrganizer.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create(CreateCompanyDto dto)
         {
             var company = new Company

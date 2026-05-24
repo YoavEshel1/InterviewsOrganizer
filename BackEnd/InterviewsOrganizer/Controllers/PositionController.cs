@@ -1,6 +1,7 @@
 using InterviewsOrganizer.Models.DTOs;
 using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InterviewsOrganizer.Controllers
@@ -17,6 +18,7 @@ namespace InterviewsOrganizer.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll(Guid companyId)
         {
             var data = await _service.GetAllAsync(companyId);
@@ -32,6 +34,7 @@ namespace InterviewsOrganizer.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create(Guid companyId, CreatePositionDto dto)
         {
             var position = new Position

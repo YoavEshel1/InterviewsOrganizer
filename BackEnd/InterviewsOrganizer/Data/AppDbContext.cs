@@ -1,9 +1,10 @@
 ﻿using InterviewsOrganizer.Models.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace InterviewsOrganizer.Data
 {
-    public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+    public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<AppUser>(options)
     {
         public DbSet<Interview> Interviews => Set<Interview>();
         public DbSet<Company> Companies => Set<Company>();

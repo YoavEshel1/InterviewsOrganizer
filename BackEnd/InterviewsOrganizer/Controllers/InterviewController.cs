@@ -1,11 +1,13 @@
 ﻿using InterviewsOrganizer.Models.DTOs;
 using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InterviewsOrganizer.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/positions/{positionId}/interviews")]
     public class InterviewController : ControllerBase
     {
@@ -16,14 +18,14 @@ namespace InterviewsOrganizer.Controllers
             _service = service;
         }
 
-        [HttpGet]
+        [HttpGet]        
         public async Task<IActionResult> GetAll(Guid positionId)
         {
             var data = await _service.GetAllAsync(positionId);
             return Ok(data);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}")]        
         public async Task<IActionResult> GetById(Guid id)
         {
             var interview = await _service.GetByIdAsync(id);
@@ -31,7 +33,7 @@ namespace InterviewsOrganizer.Controllers
             return Ok(interview);
         }
 
-        [HttpPost]
+        [HttpPost]        
         public async Task<IActionResult> Create(Guid positionId, CreateInterviewDto dto)
         {
             var interview = new Interview
@@ -45,7 +47,7 @@ namespace InterviewsOrganizer.Controllers
             return CreatedAtAction(nameof(GetById), new { positionId, id = interview.Id }, interview);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}")]        
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _service.DeleteAsync(id);

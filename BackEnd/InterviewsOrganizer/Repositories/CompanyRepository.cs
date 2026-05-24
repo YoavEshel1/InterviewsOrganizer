@@ -26,7 +26,7 @@ namespace InterviewsOrganizer.Repositories
 
         public async Task<Company?> GetById(Guid id, CancellationToken cancellationToken = default)
         {
-            return await _context.Companies.FindAsync(id, cancellationToken);
+            return await _context.Companies.FindAsync([id], cancellationToken);  
         }
 
         public async Task Save()
