@@ -1,6 +1,6 @@
 import { Component, computed, inject, Input } from '@angular/core';
 import { CdkDrag } from '@angular/cdk/drag-drop';
-import { Company } from '../models/company';
+import { Company } from '../../models/company';
 import { CompanyService } from '../companyService';
 import { NgIf } from '@angular/common';
 

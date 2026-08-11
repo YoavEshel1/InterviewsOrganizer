@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CdkDragDrop, CdkDropList, moveItemInArray} from '@angular/cdk/drag-drop';
 import { CompanyItem } from '../company-item/company-item';
 import { CompanyService } from '../companyService';
@@ -9,7 +9,8 @@ import { CompanyService } from '../companyService';
   selector: 'app-company-list',
   imports: [CompanyItem, CdkDropList],
   templateUrl: './company-list.html',
-  styleUrl: './company-list.scss' 
+  styleUrl: './company-list.scss' ,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CompanyList {
 

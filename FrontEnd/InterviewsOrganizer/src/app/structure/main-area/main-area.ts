@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CompanyList } from "../Features/company-list/company-list";
+import { CompanyList } from "../../Features/company/company-list/company-list";
 import { RouterOutlet } from '@angular/router';
 
 @Component({

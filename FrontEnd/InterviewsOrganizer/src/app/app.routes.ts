@@ -1,10 +1,12 @@
 import { Routes } from '@angular/router';
-import { CompanyList } from './Features/company-list/company-list';
-import { MainArea } from './main-area/main-area';
+import { CompanyList } from './Features/company/company-list/company-list';
+import { MainArea } from './structure/main-area/main-area';
+import { LoginForm } from './Features/login/login-form/login-form';
 
 export const routes: Routes = [
 
-    {        path: '',
+    {
+        path: '',
         redirectTo: 'companies',
         pathMatch: 'full',
     },
@@ -13,8 +15,12 @@ export const routes: Routes = [
         component: MainArea,
     },
     {
+        path: 'login',
+        component: LoginForm,
+    },
+    {
         path: '**',
-        redirectTo: 'companies',       
+        redirectTo: 'companies',
     },
 
 ];

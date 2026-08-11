@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, Signal, signal } from '@angular/core';
 import { catchError, finalize, map, tap } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Company } from './models/company';
+import { Company } from '../models/company';
 
 
 @Injectable({

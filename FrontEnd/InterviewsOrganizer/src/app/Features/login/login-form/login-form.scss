@@ -1,0 +1,33 @@
+.login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 16px 8px;
+  border-radius: 16px !important;
+
+  mat-card-header {
+    margin-bottom: 24px;
+
+    mat-card-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.submit-btn {
+  margin-top: 8px;
+  height: 44px;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+}

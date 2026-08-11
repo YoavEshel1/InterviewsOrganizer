@@ -1,9 +1,9 @@
 import { Component, effect, inject, Input, OnInit } from '@angular/core';
-import { Company } from '../models/company';
+import { Company } from '../../models/company';
 import { CompanyService } from '../companyService';
 import { FormArray,  FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Interview } from '../models/interview';
-import { Position } from '../models/position';
+import { Interview } from '../../models/interview';
+import { Position } from '../../models/position';
 
 @Component({
   selector: 'app-company-form',
