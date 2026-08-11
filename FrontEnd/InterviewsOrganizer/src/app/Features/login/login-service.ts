@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from '../../core/auth/auth.service';
@@ -7,7 +7,7 @@ import { AuthService } from '../../core/auth/auth.service';
   providedIn: 'root',
 })
 export class LoginService {
-  constructor(private authService: AuthService) {}
+  private readonly authService = inject(AuthService);
 
   login(email: string, password: string): Observable<void> {
     return this.authService.login(email, password).pipe(map(() => undefined));

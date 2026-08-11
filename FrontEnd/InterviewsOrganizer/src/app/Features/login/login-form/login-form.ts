@@ -1,15 +1,17 @@
-import { Component } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { LoginService } from '../login-service';
 
 @Component({
   selector: 'app-login-form',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
     MatFormFieldModule,
@@ -22,34 +24,33 @@ import { LoginService } from '../login-service';
   styleUrl: './login-form.scss',
 })
 export class LoginForm {
-  form: FormGroup;
-  hidePassword = true;
-  errorMessage = '';
+  private readonly loginService = inject(LoginService);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
-  constructor(
-    private fb: FormBuilder,
-    private loginService: LoginService,
-    private router: Router,
-  ) {
-    this.form = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-    });
-  }
+  readonly hidePassword = signal(true);
+  readonly errorMessage = signal('');
 
-  get email() { return this.form.get('email')!; }
-  get password() { return this.form.get('password')!; }
+  form = inject(NonNullableFormBuilder).group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+  });
+
+  get email() { return this.form.controls.email; }
+  get password() { return this.form.controls.password; }
 
   onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-    this.errorMessage = '';
-    const { email, password } = this.form.value;
-    this.loginService.login(email, password).subscribe({
+    this.errorMessage.set('');
+    const { email, password } = this.form.getRawValue();
+    this.loginService.login(email, password).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
       next: () => this.router.navigate(['/companies']),
-      error: () => (this.errorMessage = 'Invalid email or password.'),
+      error: () => this.errorMessage.set('Invalid email or password.'),
     });
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
@@ -13,10 +13,11 @@ export interface RefreshResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+
   private readonly _accessToken = signal<string | null>(null);
   readonly isAuthenticated = computed(() => this._accessToken() !== null);
-
-  constructor(private http: HttpClient, private router: Router) {}
 
   login(email: string, password: string): Observable<LoginResponse> {
     return this.http
