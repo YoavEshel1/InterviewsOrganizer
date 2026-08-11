@@ -9,13 +9,13 @@
       <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Username</mat-label>
-          <input matInput formControlName="username" autocomplete="username" />
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" autocomplete="email" />
           <mat-icon matPrefix>person_outline</mat-icon>
-          @if (username.hasError('required') && username.touched) {
-            <mat-error>Username is required</mat-error>
-          } @else if (username.hasError('minlength') && username.touched) {
-            <mat-error>At least 3 characters</mat-error>
+          @if (email.hasError('required') && email.touched) {
+            <mat-error>Email is required</mat-error>
+          } @else if (email.hasError('email') && email.touched) {
+            <mat-error>Enter a valid email address</mat-error>
           }
         </mat-form-field>
 
@@ -34,6 +34,10 @@
         </mat-form-field>
 
         <button matButton="filled" type="submit" class="full-width submit-btn">Sign In</button>
+
+        @if (errorMessage) {
+          <mat-error class="submit-error">{{ errorMessage }}</mat-error>
+        }
 
       </form>
     </mat-card-content>

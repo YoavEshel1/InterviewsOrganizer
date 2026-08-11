@@ -41,27 +41,16 @@ namespace InterviewsOrganizer.Controllers
             if (user is null || !await _userManager.CheckPasswordAsync(user, dto.Password))
                 return Unauthorized("Invalid credentials.");
 
-            var roles = await _userManager.GetRolesAsync(user);
+            var accessToken = GenerateAccessToken(user);
+            var refreshToken = GenerateRefreshToken();
 
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Email, user.Email!)
-            };
-            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+            await _userManager.UpdateAsync(user);
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            SetRefreshTokenCookie(refreshToken);
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(8),
-                signingCredentials: creds
-            );
-
-            return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+            return Ok(new { accessToken });
         }
     
         [HttpPost("refresh")]
