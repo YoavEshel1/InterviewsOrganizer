@@ -11,9 +11,22 @@
     align-items: center;
     justify-content: space-between;
     box-sizing: border-box;
-    cursor: move;
+    cursor: default;
     background: var(--color-surface);
     font-size: 14px;
     font-family: sans-serif;
     min-height: 93px;
+}
+
+.drag-handle {
+    cursor: grab;
+    padding: 0 8px;
+    font-size: 18px;
+    color: var(--color-text-primary);
+    opacity: 0.4;
+    user-select: none;
+
+    &:active {
+        cursor: grabbing;
+    }
 }

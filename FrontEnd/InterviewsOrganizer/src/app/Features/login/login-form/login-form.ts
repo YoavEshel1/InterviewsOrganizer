@@ -20,6 +20,7 @@ import { LoginService } from '../login-service';
     MatCardModule,
     MatIconModule,
   ],
+  providers: [LoginService],
   templateUrl: './login-form.html',
   styleUrl: './login-form.scss',
 })

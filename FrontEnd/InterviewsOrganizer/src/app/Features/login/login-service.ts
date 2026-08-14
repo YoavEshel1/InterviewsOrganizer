@@ -3,9 +3,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AuthService } from '../../core/auth/auth.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable() //only for login components
 export class LoginService {
   private readonly authService = inject(AuthService);
 
