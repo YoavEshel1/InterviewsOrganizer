@@ -1,7 +1,6 @@
-import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, Signal, signal } from '@angular/core';
-import { catchError, finalize, map, tap } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { HttpClient, httpResource } from '@angular/common/http';
+import { inject, Injectable, signal } from '@angular/core';
+import {  finalize, tap } from 'rxjs';
 import { Company } from '../models/company';
 
 
@@ -9,39 +8,65 @@ import { Company } from '../models/company';
   providedIn: 'root',
 })
 export class CompanyService {
-  clearSelection() {
-    throw new Error('Method not implemented.');
-  }
-  save(arg0: Company) {
-    throw new Error('Method not implemented.');
-  }
 
+  private  http =inject(HttpClient);
 
   private companiesUrl = '/api/companies';
-  private http = inject(HttpClient);
-  private loadingCompaniesSignal = signal<boolean>(false);
-  readonly loadingCompanies = this.loadingCompaniesSignal.asReadonly();
+  readonly companiesResource = httpResource<Company[]>(() =>
+    ({ url: this.companiesUrl }),
+    { defaultValue: [] as Company[] }
+  );
 
-  
+  //public
+  readonly companies = this.companiesResource.value;
+  readonly loadingCompanies = this.companiesResource.isLoading;
 
-  private companies$ = this.http.get<Company[]>(this.companiesUrl)
-    .pipe(
-      tap(() => this.loadingCompaniesSignal.set(true)),     
-      map((response: any) => response as Company[]),
-      finalize(() => this.loadingCompaniesSignal.set(false)),
-      catchError((error) => {
-        // Handle the error appropriately, e.g., log it or show a notification
-        console.error('Error fetching companies:', error);
-        return [];
-      })    
-    );
+  //selected company
+  private selectedCompanySignal = signal<Company | null>(null);
+  readonly selectedCompany = this.selectedCompanySignal.asReadonly();
 
-    companies = toSignal(this.companies$, { initialValue: [] });
-    //default to the first company or null if the list is empty
-    private selectedCompanySignal = signal<Company | null>(this.companies()[0] || null);
-    selectedCompany = this.selectedCompanySignal.asReadonly();
+
+
+ save(company: Company) {
+    const isEdit = Boolean(company.id);
+    const request$ = isEdit
+      ? this.http.put<Company>(`${this.companiesUrl}/${company.id}`, company)
+      : this.http.post<Company>(this.companiesUrl, company);
+
+    request$.pipe(
+      finalize(() => {
+        //automatically reload the companies list after saving
+        this.companiesResource.reload();
+        this.clearSelection();
+      })
+    ).subscribe();
+  }
+
+  //delete a company by id
+  deleteCompany(id: string) {
+    this.http.delete(`${this.companiesUrl}/${id}`).pipe(
+      finalize(() => {
+        this.companiesResource.reload();
+        // check if the deleted company is the selected one, and if so, clear the selection
+        const selectedCompany = this.selectedCompany();
+        if (selectedCompany && selectedCompany.id === id) {
+          this.clearSelection();
+        }
+      })
+    ).subscribe();
+  }
+
+  //state management
+
+  selectCompany(company: Company) {
+    this.selectedCompanySignal.set(company);
+  }
 
   editCompany(company: Company) {
     this.selectedCompanySignal.set(company);
+  }
+
+  clearSelection() {
+    this.selectedCompanySignal.set(null);
   }
 }

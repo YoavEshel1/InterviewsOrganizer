@@ -4,10 +4,12 @@ import { CompanyService } from '../companyService';
 import { FormArray,  FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Interview } from '../../models/interview';
 import { Position } from '../../models/position';
+import { ActivatedRoute } from '@angular/router';
+import { AutoRequiredDirective } from '../.././../shared/directives/auto-required.directive';
 
 @Component({
   selector: 'app-company-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, AutoRequiredDirective],
   templateUrl: './company-form.html',
   styleUrl: './company-form.scss',
 })
@@ -17,7 +19,7 @@ export class CompanyForm {
   private fb = inject(FormBuilder);
 
   form = this.fb.group({
-    name: [''],
+    name: ['', Validators.required],
     companyInfo: [''],
     logoUrl: [''],
     positions: this.fb.array([]) // This will hold the positions form groups  
@@ -35,7 +37,17 @@ export class CompanyForm {
       .get('interviews') as FormArray;
   }
 
+  private route = inject(ActivatedRoute);
+
   constructor() {
+    effect(() => {
+      const id = this.route.snapshot.paramMap.get('id');
+      const company = this.companyService.companies().find(c => c.id === id);
+      if (company) {
+        this.companyService.editCompany(company);
+      }
+    });
+
     effect(() => {
       const selectedCompany = this.companyService.selectedCompany();
       if (selectedCompany) {
@@ -52,9 +64,11 @@ export class CompanyForm {
 
     // 2. Rebuild the positions FormArray
     this.positions.clear();
-    selectedCompany.positions.forEach(p => {
-      this.positions.push(this.makePositionGroup(p));
-    });
+    if (selectedCompany.positions) {
+      selectedCompany.positions.forEach(p => {
+        this.positions.push(this.makePositionGroup(p));
+      });
+    }
   }
 
    /** Was a top-level field touched and is invalid? */

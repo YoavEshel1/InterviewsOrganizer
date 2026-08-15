@@ -1,27 +1,31 @@
-import { Component, computed, inject, Input } from '@angular/core';
-import { CdkDrag } from '@angular/cdk/drag-drop';
+import { Component, computed, inject, input } from '@angular/core';
+import { CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { Company } from '../../models/company';
 import { CompanyService } from '../companyService';
 import { NgIf } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-company-item',
-  imports: [CdkDrag, NgIf],
+  imports: [CdkDrag, CdkDragHandle, NgIf],
   templateUrl: './company-item.html',
   styleUrl: './company-item.scss',
 })
 export class CompanyItem {
 
-  @Input() company!: Company;
+  company =input.required<Company>();
   private companyService = inject(CompanyService);
+  private router = inject(Router);
 
-  isSelected = computed(() => this.companyService.selectedCompany()?.id === this.company.id);
+  isSelected = computed(() => this.companyService.selectedCompany()?.id === this.company().id);
 
-
-
+  selectCompany() {
+    this.router.navigate(['/companies', this.company().id]);
+    this.companyService.selectCompany(this.company());
+  }
 
   editCompany() {
-    this.companyService.editCompany(this.company);
+    this.companyService.editCompany(this.company());
   }
 
 }

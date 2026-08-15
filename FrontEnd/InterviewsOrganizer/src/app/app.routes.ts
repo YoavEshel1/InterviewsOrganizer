@@ -3,6 +3,7 @@ import { CompanyList } from './Features/company/company-list/company-list';
 import { MainArea } from './structure/main-area/main-area';
 import { LoginForm } from './Features/login/login-form/login-form';
 import { authGuard } from './core/auth/auth.guard';
+import { CompanyForm } from './Features/company/company-form/company-form';
 
 export const routes: Routes = [
 
@@ -15,6 +16,12 @@ export const routes: Routes = [
         path: 'companies',
         component: MainArea,
         canActivate: [authGuard],
+        children: [
+            {
+                path: ':id',
+                component: CompanyForm,
+            },
+        ],
     },
     {
         path: 'login',

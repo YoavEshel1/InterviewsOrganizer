@@ -14,16 +14,17 @@
         <h2>Company Details</h2>
         <form [formGroup]="form" (ngSubmit)="saveChanges()">
             <div class="form-group">
-                <div>
+                <div class="field">
                     <label for="companyName">Company Name</label>
-                    <input type="text" id="companyName" name="companyName" class="form-control" formControlName="name"
+                    <input type="text" id="companyName" name="companyName" 
+                    class="form-control" formControlName="name"
                         placeholder="Company name">
                     @if (isInvalid('name')) {
                     <span class="cf-error">Company name is required</span>
                     }
 
                 </div>
-                <div>
+                <div class="field">
                     <label for="company-info">Company Info</label>
                     <textarea id="company-info" name="company-info" class="form-control" formControlName="companyInfo"
                         placeholder="Company info"></textarea>
