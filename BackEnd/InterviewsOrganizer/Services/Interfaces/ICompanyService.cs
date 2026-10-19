@@ -7,5 +7,6 @@ namespace InterviewsOrganizer.Services.Interfaces
         Task<List<Company>> GetAllAsync(CancellationToken cancellationToken = default);
         Task<Company?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task CreateAsync(Company company);
+        Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default);
     }
 }

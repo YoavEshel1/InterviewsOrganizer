@@ -18,6 +18,24 @@ namespace InterviewsOrganizer.Data
                 .HasOne<Company>()
                 .WithMany(c => c.Positions)
                 .HasForeignKey(p => p.CompanyId);
+
+            modelBuilder.Entity<Company>()
+                .HasOne<AppUser>()
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Position>()
+                .HasOne<AppUser>()
+                .WithMany()
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Interview>()
+                .HasOne<AppUser>()
+                .WithMany()
+                .HasForeignKey(i => i.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

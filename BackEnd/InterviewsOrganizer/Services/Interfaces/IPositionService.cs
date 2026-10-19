@@ -7,5 +7,6 @@ namespace InterviewsOrganizer.Services.Interfaces
         Task<List<Position>> GetAllAsync(Guid companyId);
         Task<Position?> GetByIdAsync(Guid id);
         Task CreateAsync(Position position, Guid companyId);
+        Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default);
     }
 }

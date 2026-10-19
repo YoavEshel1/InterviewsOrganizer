@@ -8,6 +8,7 @@ using InterviewsOrganizer.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -74,14 +75,29 @@ builder.Services.AddScoped<IPositionService, PositionService>();
 builder.Services.AddScoped<IInterviewService, InterviewService>();
 builder.Services.AddScoped<IInterviewRepository, InterviewRepository>();
 builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IUserCleanupService, UserCleanupService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 // Swagger with JWT support
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddSwaggerGen(options =>
 {
-    c.OperationFilter<AuthOperationFilter>();
+    options.SwaggerDoc("v1", new() { Title = "InterviewsOrganizer", Version = "v1" });
+
+    // Defines the "Bearer" security scheme used by the [Authorize]-driven operation filter below.
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.ParameterLocation.Header,
+        Description = "Enter a valid JWT token. The \"Bearer \" prefix is added automatically."
+    });
+
+    // Adds the security requirement only to operations that require authorization.
+    options.OperationFilter<AuthOperationFilter>();
 });
 
 builder.Services.AddOpenApi();

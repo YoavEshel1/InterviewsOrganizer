@@ -3,6 +3,7 @@ using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace InterviewsOrganizer.Controllers
 {
@@ -36,12 +37,14 @@ namespace InterviewsOrganizer.Controllers
         [HttpPost]        
         public async Task<IActionResult> Create(Guid positionId, CreateInterviewDto dto)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var interview = new Interview
             {
                 Date = dto.Date,
                 Feeling = dto.Feeling,
                 Interviewer = dto.Interviewer,
-                Notes = dto.Notes
+                Notes = dto.Notes,
+                UserId = userId
             };
             await _service.CreateAsync(interview, positionId);
             return CreatedAtAction(nameof(GetById), new { positionId, id = interview.Id }, interview);

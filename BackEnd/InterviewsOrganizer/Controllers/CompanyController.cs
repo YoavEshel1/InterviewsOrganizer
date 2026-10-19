@@ -4,6 +4,7 @@ using InterviewsOrganizer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace InterviewsOrganizer.Controllers
 {
@@ -42,10 +43,12 @@ namespace InterviewsOrganizer.Controllers
         [Authorize]
         public async Task<IActionResult> Create(CreateCompanyDto dto)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
             var company = new Company
             {
                 Name = dto.Name,
-                CompanyInfo = dto.CompanyInfo
+                CompanyInfo = dto.CompanyInfo,
+                UserId = userId
             };
             await _service.CreateAsync(company);
             return CreatedAtAction(nameof(GetById), new { id = company.Id }, company);

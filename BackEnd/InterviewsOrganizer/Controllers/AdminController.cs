@@ -1,5 +1,6 @@
 using InterviewsOrganizer.Models.DTOs;
 using InterviewsOrganizer.Models.Entities;
+using InterviewsOrganizer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +13,12 @@ namespace InterviewsOrganizer.Controllers
     public class AdminController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly IUserCleanupService _userCleanupService;
 
-        public AdminController(UserManager<AppUser> userManager)
+        public AdminController(UserManager<AppUser> userManager, IUserCleanupService userCleanupService)
         {
             _userManager = userManager;
+            _userCleanupService = userCleanupService;
         }
 
         /// <summary>
@@ -50,9 +53,12 @@ namespace InterviewsOrganizer.Controllers
         [HttpDelete("users/{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user is null) return NotFound();
-            await _userManager.DeleteAsync(user);
+            var userExists = await _userManager.FindByIdAsync(id);
+            if (userExists is null) return NotFound();
+
+            var result = await _userCleanupService.DeleteUserAndDataAsync(id);
+            if (!result.Succeeded) return BadRequest(result.Errors);
+
             return NoContent();
         }
     }

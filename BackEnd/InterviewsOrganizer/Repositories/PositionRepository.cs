@@ -32,6 +32,13 @@ namespace InterviewsOrganizer.Repositories
             return await _context.Positions.FindAsync(id);
         }
 
+        public async Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default)
+        {
+            await _context.Positions
+                .Where(p => p.UserId == userId)
+                .ExecuteDeleteAsync(cancellationToken);
+        }
+
         public async Task Save()
         {
             await _context.SaveChangesAsync();

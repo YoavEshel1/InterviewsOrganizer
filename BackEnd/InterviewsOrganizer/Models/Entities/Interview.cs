@@ -4,11 +4,12 @@ namespace InterviewsOrganizer.Models.Entities
 {
     public class Interview
     {
-        public Guid Id { get; set; }       
+        public Guid Id { get; set; }
         public DateTime Date { get; set; }
-        public InterviewFeeling Feeling { get; set; }           
+        public InterviewFeeling Feeling { get; set; }
         public Guid PositionId { get; set; }
-        public string ? Interviewer { get; set; }
+        public string? Interviewer { get; set; }
         public string? Notes { get; set; }
+        public required string UserId { get; set; }
     }
 }

@@ -7,6 +7,7 @@ namespace InterviewsOrganizer.Repositories.Interfaces
         Task Add(Interview interview, Guid positionId);
         Task<List<Interview>> GetAll(Guid positionId);
         Task<Interview?> GetById(Guid id);
+        Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default);
         Task Save();
     }
 }

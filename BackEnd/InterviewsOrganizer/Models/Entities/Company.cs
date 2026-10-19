@@ -5,6 +5,7 @@
         public Guid Id { get; set; }
         public required string Name { get; set; }
         public string? CompanyInfo { get; set; }
+        public required string UserId { get; set; }
         public List<Position>? Positions { get; set; }
     }
 }

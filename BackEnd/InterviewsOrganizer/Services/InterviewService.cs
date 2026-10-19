@@ -33,6 +33,9 @@ namespace InterviewsOrganizer.Services
             // Add Delete to repository if needed
             return false;
         }
+
+        public async Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default) =>
+            await _interviewRepository.DeleteByUserIdAsync(userId, cancellationToken);
     }
 }
 

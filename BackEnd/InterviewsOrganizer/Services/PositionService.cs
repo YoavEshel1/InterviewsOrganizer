@@ -24,5 +24,8 @@ namespace InterviewsOrganizer.Services
             await _positionRepository.Add(position, companyId);
             await _positionRepository.Save();
         }
+
+        public async Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default) =>
+            await _positionRepository.DeleteByUserIdAsync(userId, cancellationToken);
     }
 }

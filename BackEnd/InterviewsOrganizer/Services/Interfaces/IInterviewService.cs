@@ -8,5 +8,6 @@ namespace InterviewsOrganizer.Services.Interfaces
         Task<Interview?> GetByIdAsync(Guid id);
         Task CreateAsync(Interview interview, Guid positionId);
         Task<bool> DeleteAsync(Guid id);
+        Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default);
     }
 }
