@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="../Tools/CompanyListExtractor/CompanyListExtractor/CompanyListExtractor.csproj" />
   <Project Path="InterviewsOrganizer/InterviewsOrganizer.csproj" />
 </Solution>

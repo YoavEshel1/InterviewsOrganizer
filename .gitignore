@@ -7,3 +7,9 @@ BackEnd/InterviewsOrganizer/bin/
 BackEnd/InterviewsOrganizer/obj/
 
 /.vs/CopilotSnapshots/05C3D4C882449548A2294EB34E08074F
+/Tools/CompanyListExtractor/.vs
+/Tools/CompanyListExtractor/CompanyListExtractor/bin/Debug/net10.0
+/Tools/CompanyListExtractor/CompanyListExtractor/obj
+/tasks/interviews_organizer_jira.csv.bak
+/Research
+/tasks
