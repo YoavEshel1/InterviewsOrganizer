@@ -1,13 +1,10 @@
 using InterviewsOrganizer.Models.DTOs;
 using InterviewsOrganizer.Models.Entities;
+using InterviewsOrganizer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace InterviewsOrganizer.Controllers
 {
@@ -17,12 +14,12 @@ namespace InterviewsOrganizer.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly IConfiguration _configuration;
+        private readonly ITokenService _tokenService;
 
-        public AuthController(UserManager<AppUser> userManager, IConfiguration configuration)
+        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService)
         {
             _userManager = userManager;
-            _configuration = configuration;
+            _tokenService = tokenService;
         }
 
         [HttpPost("register")]
@@ -41,7 +38,8 @@ namespace InterviewsOrganizer.Controllers
             if (user is null || !await _userManager.CheckPasswordAsync(user, dto.Password))
                 return Unauthorized("Invalid credentials.");
 
-            var accessToken = GenerateAccessToken(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            var accessToken = _tokenService.GenerateAccessToken(user, roles);
             var refreshToken = GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;
@@ -63,7 +61,8 @@ namespace InterviewsOrganizer.Controllers
             if (user is null || user.RefreshTokenExpiry < DateTime.UtcNow)
                 return Unauthorized();
 
-            var newAccessToken = GenerateAccessToken(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            var newAccessToken = _tokenService.GenerateAccessToken(user, roles);
             var newRefreshToken = GenerateRefreshToken();
 
             user.RefreshToken = newRefreshToken;
@@ -91,28 +90,6 @@ namespace InterviewsOrganizer.Controllers
             }
             Response.Cookies.Delete("refreshToken");
             return Ok();
-        }
-
-        private string GenerateAccessToken(AppUser user)
-        {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Email, user.Email!)
-            };
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(15),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         private static string GenerateRefreshToken()

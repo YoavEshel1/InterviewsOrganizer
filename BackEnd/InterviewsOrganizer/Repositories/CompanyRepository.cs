@@ -32,6 +32,7 @@ namespace InterviewsOrganizer.Repositories
         public async Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default)
         {
             await _context.Companies
+                .IgnoreQueryFilters() // ignore "Global query filter" in AppDbContext.cs for Admin users    
                 .Where(c => c.UserId == userId)
                 .ExecuteDeleteAsync(cancellationToken);
         }

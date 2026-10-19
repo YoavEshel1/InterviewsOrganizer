@@ -4,6 +4,7 @@ using InterviewsOrganizer.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace InterviewsOrganizer.Controllers
 {
@@ -14,11 +15,19 @@ namespace InterviewsOrganizer.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IUserCleanupService _userCleanupService;
+        private readonly ITokenService _tokenService;
+        private readonly IAuditLogService _auditLogService;
 
-        public AdminController(UserManager<AppUser> userManager, IUserCleanupService userCleanupService)
+        public AdminController(
+            UserManager<AppUser> userManager,
+            IUserCleanupService userCleanupService,
+            ITokenService tokenService,
+            IAuditLogService auditLogService)
         {
             _userManager = userManager;
             _userCleanupService = userCleanupService;
+            _tokenService = tokenService;
+            _auditLogService = auditLogService;
         }
 
         /// <summary>
@@ -60,6 +69,32 @@ namespace InterviewsOrganizer.Controllers
             if (!result.Succeeded) return BadRequest(result.Errors);
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Starts an impersonation session for the target user. SuperAdmin only.
+        /// Returns a short-lived access token scoped to the target user; all actions
+        /// are recorded in the audit log for GDPR compliance.
+        /// </summary>
+        [HttpPost("impersonate")]
+        public async Task<IActionResult> Impersonate(ImpersonateDto dto, CancellationToken cancellationToken)
+        {
+            var targetUser = await _userManager.FindByEmailAsync(dto.TargetEmail);
+            if (targetUser is null) return NotFound("Target user not found.");
+
+            var adminUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+            await _auditLogService.LogAsync(
+                adminUserId,
+                targetUser.Id,
+                "User_Impersonation_Started",
+                ipAddress,
+                cancellationToken);
+
+            var accessToken = _tokenService.GenerateImpersonationToken(targetUser, adminUserId);
+
+            return Ok(new { accessToken });
         }
     }
 }
