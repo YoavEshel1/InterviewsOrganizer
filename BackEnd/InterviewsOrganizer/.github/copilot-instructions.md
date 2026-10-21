@@ -12,6 +12,7 @@ You are an expert .NET Senior Architect and Developer focusing on High Performan
 - **Architecture**: Separate concerns cleanly (Controllers -> Services/Handlers -> Repositories/DbContext).
 - **DTOs & Projection**: Never expose DbContext Entities directly in API endpoints. Use DTOs/Records and project using EF Core `.Select()`.
 - **Validation**: Prefer FluentValidation or Data Annotations. Validate input DTOs before reaching business logic.
+- **Record DTOs**: When applying Data Annotation attributes to a `record`'s primary-constructor parameters, apply them directly on the parameter (e.g. `[Required] string Name`). Never use the `[property: ...]` attribute target on validation attributes for MVC-bound DTOs — ASP.NET Core's model validation throws `InvalidOperationException` ("Record type ... has validation metadata defined on property ... that will be ignored") when validation attributes are redirected to the generated property instead of the constructor parameter.
 - **Global Exception Handling**: Use `UseExceptionHandler` middleware or `IExceptionHandler` (.NET 8) instead of huge try-catch blocks inside controllers.
 
 ## 3. Entity Framework Core & SQL Performance (CRITICAL)

@@ -1,5 +1,6 @@
 using InterviewsOrganizer.Data;
 using InterviewsOrganizer.Models.Entities;
+using InterviewsOrganizer.Models.Enums;
 using InterviewsOrganizer.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,9 +41,29 @@ namespace InterviewsOrganizer.Repositories
                 .ExecuteDeleteAsync(cancellationToken);
         }
 
-        public async Task Save()
+        public async Task<Position> Update(Guid id, Guid companyId, string title, DateTime? applyDate, PositionStatus status, string? notes, CancellationToken cancellationToken = default)
         {
-            await _context.SaveChangesAsync();
+            // Global query filter in AppDbContext.cs restricts this to the current user's own positions.
+            // Filtering by CompanyId too guards against a mismatched route companyId.
+            var existing = await _context.Positions
+                .FirstOrDefaultAsync(p => p.Id == id && p.CompanyId == companyId, cancellationToken);
+
+            if (existing is null)
+            {
+                throw new KeyNotFoundException($"Position with id {id} was not found.");
+            }
+
+            // Only update mutable fields; UserId/CompanyId (ownership) must never change.
+            existing.Title = title;
+            existing.ApplyDate = applyDate;
+            existing.Status = status;
+            existing.Notes = notes;
+            return existing;
+        }
+
+        public async Task Save(CancellationToken cancellationToken = default)
+        {
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }
