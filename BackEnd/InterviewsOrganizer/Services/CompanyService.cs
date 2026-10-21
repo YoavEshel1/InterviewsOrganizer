@@ -1,3 +1,4 @@
+using InterviewsOrganizer.Models.DTOs;
 using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Repositories.Interfaces;
 using InterviewsOrganizer.Services.Interfaces;
@@ -23,6 +24,15 @@ namespace InterviewsOrganizer.Services
         {
             await _companyRepository.Add(company);
             await _companyRepository.Save();
+        }
+
+        public async Task<UpdateCompanyDto> UpdateAsync(UpdateCompanyDto dto, CancellationToken cancellationToken = default)
+        {
+            if (dto is null) throw new ArgumentNullException(nameof(dto));
+
+            var updatedCompany = await _companyRepository.Update(dto.Id, dto.Name, dto.CompanyInfo, cancellationToken);
+            await _companyRepository.Save(cancellationToken);
+            return new UpdateCompanyDto(updatedCompany.Id, updatedCompany.Name, updatedCompany.CompanyInfo);
         }
 
         public async Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default) =>

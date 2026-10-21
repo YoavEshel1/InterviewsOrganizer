@@ -53,5 +53,14 @@ namespace InterviewsOrganizer.Controllers
             await _service.CreateAsync(company);
             return CreatedAtAction(nameof(GetById), new { id = company.Id }, company);
         }
+
+
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> Update(UpdateCompanyDto dto, CancellationToken cancellationToken)
+        {
+            var updatedCompany = await _service.UpdateAsync(dto, cancellationToken);
+            return Ok(updatedCompany);
+        }
     }
 }

@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/.github/">
+    <File Path="InterviewsOrganizer/.github/copilot-instructions.md" />
+  </Folder>
   <Project Path="../Tools/CompanyListExtractor/CompanyListExtractor/CompanyListExtractor.csproj" />
   <Project Path="InterviewsOrganizer/InterviewsOrganizer.csproj" />
 </Solution>

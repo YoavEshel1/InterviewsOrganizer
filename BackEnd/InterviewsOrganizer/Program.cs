@@ -1,4 +1,5 @@
 using InterviewsOrganizer.Data;
+using InterviewsOrganizer.Middleware;
 using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Repositories;
 using InterviewsOrganizer.Repositories.Interfaces;
@@ -6,6 +7,7 @@ using InterviewsOrganizer.Services;
 using InterviewsOrganizer.Services.Interfaces;
 using InterviewsOrganizer.Swagger;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -68,6 +70,22 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddRequestTimeouts(); // ← required for [RequestTimeout] attribute
 
+builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = context =>
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            var exceptionFeature = context.HttpContext.Features.Get<IExceptionHandlerFeature>();
+            if (exceptionFeature?.Error is { } ex)
+            {
+                context.ProblemDetails.Detail = ex.ToString();
+            }
+        }
+    };
+});
+
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IPositionRepository, PositionRepository>();
@@ -125,6 +143,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseExceptionHandler(); // must be early in the pipeline so it can catch exceptions from later middleware/endpoints
 app.UseHttpsRedirection();
 app.UseRequestTimeouts(); // ← required for [RequestTimeout] attribute
 app.UseAuthentication();

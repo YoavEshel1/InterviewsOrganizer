@@ -8,6 +8,7 @@ namespace InterviewsOrganizer.Repositories.Interfaces
         Task<List<Company>> GetAll(CancellationToken cancellationToken = default);
         Task<Company?> GetById(Guid id, CancellationToken cancellationToken = default); 
         Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default);
-        Task Save();
+        Task<Company> Update(Guid id, string name, string? companyInfo, CancellationToken cancellationToken = default);
+        Task Save(CancellationToken cancellationToken = default);
     }
 }
