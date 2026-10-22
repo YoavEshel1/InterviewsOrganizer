@@ -27,13 +27,8 @@ namespace InterviewsOrganizer.Services
             await _interviewRepository.Save();
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
-        {
-            var interview = await _interviewRepository.GetById(id);
-            if (interview is null) return false;
-            // Add Delete to repository if needed
-            return false;
-        }
+        public async Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default) =>
+            await _interviewRepository.DeleteByUserIdAsync(userId, cancellationToken);
 
         public async Task<UpdateInterviewDto> UpdateAsync(Guid id, Guid positionId, UpdateInterviewDto dto, CancellationToken cancellationToken = default)
         {
@@ -44,8 +39,13 @@ namespace InterviewsOrganizer.Services
             return new UpdateInterviewDto(updatedInterview.Date, updatedInterview.Feeling, updatedInterview.Interviewer, updatedInterview.Notes);
         }
 
-        public async Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default) =>
-            await _interviewRepository.DeleteByUserIdAsync(userId, cancellationToken);
+        public async Task DeleteAsync(Guid id, Guid positionId, CancellationToken cancellationToken = default)
+        {
+            if (id == Guid.Empty) throw new ArgumentException("Id cannot be empty.", nameof(id));
+
+            await _interviewRepository.DeleteAsync(id, positionId, cancellationToken);
+            await _interviewRepository.Save(cancellationToken);
+        }
     }
 }
 

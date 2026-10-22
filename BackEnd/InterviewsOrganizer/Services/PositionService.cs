@@ -37,5 +37,13 @@ namespace InterviewsOrganizer.Services
 
         public async Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default) =>
             await _positionRepository.DeleteByUserIdAsync(userId, cancellationToken);
+
+        public async Task DeleteAsync(Guid id, Guid companyId, CancellationToken cancellationToken = default)
+        {
+            if (id == Guid.Empty) throw new ArgumentException("Id cannot be empty.", nameof(id));
+
+            await _positionRepository.DeleteAsync(id, companyId, cancellationToken);
+            await _positionRepository.Save(cancellationToken);
+        }
     }
 }

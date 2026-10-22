@@ -58,10 +58,9 @@ namespace InterviewsOrganizer.Controllers
         }
 
         [HttpDelete("{id}")]        
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> Delete(Guid positionId, Guid id, CancellationToken cancellationToken)
         {
-            var result = await _service.DeleteAsync(id);
-            if (!result) return NotFound();
+            await _service.DeleteAsync(id, positionId, cancellationToken);
             return NoContent();
         }
     }

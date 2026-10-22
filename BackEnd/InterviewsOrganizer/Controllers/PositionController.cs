@@ -59,5 +59,13 @@ namespace InterviewsOrganizer.Controllers
             var updatedPosition = await _service.UpdateAsync(id, companyId, dto, cancellationToken);
             return Ok(updatedPosition);
         }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> Delete(Guid companyId, Guid id, CancellationToken cancellationToken)
+        {
+            await _service.DeleteAsync(id, companyId, cancellationToken);
+            return NoContent();
+        }
     }
 }

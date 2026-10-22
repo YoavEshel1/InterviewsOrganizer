@@ -65,5 +65,20 @@ namespace InterviewsOrganizer.Repositories
         {
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task DeleteAsync(Guid id, Guid companyId, CancellationToken cancellationToken = default)
+        {
+            // Global query filter in AppDbContext.cs restricts this to the current user's own positions.
+            // Filtering by CompanyId too guards against a mismatched route companyId.
+            var existing = await _context.Positions
+                .FirstOrDefaultAsync(p => p.Id == id && p.CompanyId == companyId, cancellationToken);
+
+            if (existing is null)
+            {
+                throw new KeyNotFoundException($"Position with id {id} was not found.");
+            }
+
+            _context.Positions.Remove(existing);
+        }
     }
 }
