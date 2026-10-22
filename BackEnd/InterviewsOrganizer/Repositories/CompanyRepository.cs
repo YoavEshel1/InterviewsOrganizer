@@ -60,5 +60,18 @@ namespace InterviewsOrganizer.Repositories
         {
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+        {
+            var existing = await _context.Companies
+               .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+
+            if (existing is null)
+            {
+                throw new KeyNotFoundException($"Company with id {id} was not found.");
+            }
+
+            _context.Companies.Remove(existing);            
+        }
     }
 }

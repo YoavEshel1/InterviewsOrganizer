@@ -10,5 +10,6 @@ namespace InterviewsOrganizer.Repositories.Interfaces
         Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default);
         Task<Company> Update(Guid id, string name, string? companyInfo, CancellationToken cancellationToken = default);
         Task Save(CancellationToken cancellationToken = default);
+        Task DeleteAsync(Guid id, CancellationToken cancellationToken);
     }
 }

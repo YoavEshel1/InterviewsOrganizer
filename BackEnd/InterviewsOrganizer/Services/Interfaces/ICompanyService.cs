@@ -10,5 +10,6 @@ namespace InterviewsOrganizer.Services.Interfaces
         Task CreateAsync(Company company);
         Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default);
         Task<UpdateCompanyDto> UpdateAsync(UpdateCompanyDto dto, CancellationToken cancellationToken = default);
+        Task DeleteAsync(Guid id, CancellationToken cancellationToken);
     }
 }
