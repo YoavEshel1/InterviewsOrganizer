@@ -1,4 +1,5 @@
-﻿using InterviewsOrganizer.Models.Entities;
+﻿using InterviewsOrganizer.Models.DTOs;
+using InterviewsOrganizer.Models.Entities;
 
 namespace InterviewsOrganizer.Services.Interfaces
 {
@@ -9,5 +10,6 @@ namespace InterviewsOrganizer.Services.Interfaces
         Task CreateAsync(Interview interview, Guid positionId);
         Task<bool> DeleteAsync(Guid id);
         Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default);
+        Task<UpdateInterviewDto> UpdateAsync(Guid id, Guid positionId, UpdateInterviewDto dto, CancellationToken cancellationToken = default);
     }
 }

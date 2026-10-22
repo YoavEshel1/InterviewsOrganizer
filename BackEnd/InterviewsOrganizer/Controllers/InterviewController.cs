@@ -50,6 +50,13 @@ namespace InterviewsOrganizer.Controllers
             return CreatedAtAction(nameof(GetById), new { positionId, id = interview.Id }, interview);
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid positionId, Guid id, UpdateInterviewDto dto, CancellationToken cancellationToken)
+        {
+            var updatedInterview = await _service.UpdateAsync(id, positionId, dto, cancellationToken);
+            return Ok(updatedInterview);
+        }
+
         [HttpDelete("{id}")]        
         public async Task<IActionResult> Delete(Guid id)
         {

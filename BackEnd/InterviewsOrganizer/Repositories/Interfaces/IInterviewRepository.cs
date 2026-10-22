@@ -1,4 +1,5 @@
 ﻿using InterviewsOrganizer.Models.Entities;
+using InterviewsOrganizer.Models.Enums;
 
 namespace InterviewsOrganizer.Repositories.Interfaces
 {
@@ -8,6 +9,7 @@ namespace InterviewsOrganizer.Repositories.Interfaces
         Task<List<Interview>> GetAll(Guid positionId);
         Task<Interview?> GetById(Guid id);
         Task DeleteByUserIdAsync(string userId, CancellationToken cancellationToken = default);
-        Task Save();
+        Task<Interview> Update(Guid id, Guid positionId, DateTime date, InterviewFeeling feeling, string? interviewer, string? notes, CancellationToken cancellationToken = default);
+        Task Save(CancellationToken cancellationToken = default);
     }
 }
