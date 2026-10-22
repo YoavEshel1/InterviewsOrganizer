@@ -8,10 +8,12 @@ namespace InterviewsOrganizer.Services
     public class CompanyService : ICompanyService
     {
         private readonly ICompanyRepository _companyRepository;
+        private readonly ILogger<CompanyService> _logger;
 
-        public CompanyService(ICompanyRepository companyRepository)
+        public CompanyService(ICompanyRepository companyRepository, ILogger<CompanyService> logger)
         {
             _companyRepository = companyRepository;
+            _logger = logger;
         }
 
         public async Task<List<Company>> GetAllAsync(CancellationToken cancellationToken = default) =>
@@ -24,6 +26,7 @@ namespace InterviewsOrganizer.Services
         {
             await _companyRepository.Add(company);
             await _companyRepository.Save();
+            _logger.LogInformation("Company {CompanyId} created by user {UserId}", company.Id, company.UserId);
         }
 
         public async Task<UpdateCompanyDto> UpdateAsync(UpdateCompanyDto dto, CancellationToken cancellationToken = default)
@@ -40,9 +43,15 @@ namespace InterviewsOrganizer.Services
 
         public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
         {
-            if (id == Guid.Empty) throw new ArgumentException("Id cannot be empty.", nameof(id));
+            if (id == Guid.Empty)
+            {
+                _logger.LogWarning("DeleteAsync called with an empty Company Id");
+                throw new ArgumentException("Id cannot be empty.", nameof(id));
+            }
+
             await _companyRepository.DeleteAsync(id, cancellationToken);
             await _companyRepository.Save(cancellationToken);
+            _logger.LogInformation("Company {CompanyId} deleted", id);
         }
     }
 }

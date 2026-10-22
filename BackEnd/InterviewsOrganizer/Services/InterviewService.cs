@@ -9,10 +9,12 @@ namespace InterviewsOrganizer.Services
     public class InterviewService : IInterviewService
     {
         private readonly IInterviewRepository _interviewRepository;
+        private readonly ILogger<InterviewService> _logger;
 
-        public InterviewService(IInterviewRepository interviewRepository)
+        public InterviewService(IInterviewRepository interviewRepository, ILogger<InterviewService> logger)
         {
             _interviewRepository = interviewRepository;
+            _logger = logger;
         }
 
         public async Task<List<Interview>> GetAllAsync(Guid positionId) =>
@@ -32,7 +34,11 @@ namespace InterviewsOrganizer.Services
 
         public async Task<UpdateInterviewDto> UpdateAsync(Guid id, Guid positionId, UpdateInterviewDto dto, CancellationToken cancellationToken = default)
         {
-            if (dto is null) throw new ArgumentNullException(nameof(dto));
+            if (dto is null) 
+            {
+                _logger.LogWarning("UpdateAsync called with a null dto.");
+                throw new ArgumentNullException(nameof(dto));
+            }
 
             var updatedInterview = await _interviewRepository.Update(id, positionId, dto.Date, dto.Feeling, dto.Interviewer, dto.Notes, cancellationToken);
             await _interviewRepository.Save(cancellationToken);
@@ -41,7 +47,11 @@ namespace InterviewsOrganizer.Services
 
         public async Task DeleteAsync(Guid id, Guid positionId, CancellationToken cancellationToken = default)
         {
-            if (id == Guid.Empty) throw new ArgumentException("Id cannot be empty.", nameof(id));
+            if (id == Guid.Empty)
+            { 
+                _logger.LogWarning("DeleteAsync called with an empty Id.");
+                throw new ArgumentException("Id cannot be empty.", nameof(id)); 
+            }
 
             await _interviewRepository.DeleteAsync(id, positionId, cancellationToken);
             await _interviewRepository.Save(cancellationToken);

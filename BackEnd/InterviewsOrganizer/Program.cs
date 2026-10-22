@@ -10,11 +10,28 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
 
-var builder = WebApplication.CreateBuilder(args);
+// Bootstrap logger: captures anything that happens before the host (and its configured
+// Serilog pipeline) is fully built, including host-startup failures.
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
+try
+{
+    Log.Information("Starting InterviewsOrganizer API");
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    // Replace the default logging provider with Serilog, configured from appsettings.json ("Serilog" section).
+    builder.Host.UseSerilog((context, services, loggerConfiguration) =>
+        loggerConfiguration
+            .ReadFrom.Configuration(context.Configuration)
+            .ReadFrom.Services(services)
+            .Enrich.FromLogContext());
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -71,6 +88,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddRequestTimeouts(); // ← required for [RequestTimeout] attribute
 
 builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = context =>
@@ -144,9 +162,24 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseExceptionHandler(); // must be early in the pipeline so it can catch exceptions from later middleware/endpoints
+
+// Logs one summary line per HTTP request (path, method, status code, elapsed time).
+app.UseSerilogRequestLogging();
+
 app.UseHttpsRedirection();
 app.UseRequestTimeouts(); // ← required for [RequestTimeout] attribute
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+}
+catch (Exception ex) when (ex is not HostAbortedException)
+{
+    // HostAbortedException is thrown by `dotnet ef` design-time tooling; it is not a real failure.
+    Log.Fatal(ex, "InterviewsOrganizer API terminated unexpectedly");
+    throw;
+}
+finally
+{
+    Log.CloseAndFlush();
+}
