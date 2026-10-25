@@ -30,6 +30,7 @@ namespace InterviewsOrganizer.Swagger
             operation.Security ??= [];
             operation.Security.Add(requirement);
 
+            operation.Responses ??= [];
             operation.Responses.TryAdd("401", new OpenApiResponse { Description = "Unauthorized" });
             operation.Responses.TryAdd("403", new OpenApiResponse { Description = "Forbidden" });
         }
