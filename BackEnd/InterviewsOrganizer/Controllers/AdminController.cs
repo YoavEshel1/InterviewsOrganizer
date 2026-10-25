@@ -1,9 +1,12 @@
+using InterviewsOrganizer.Data;
 using InterviewsOrganizer.Models.DTOs;
 using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Services.Interfaces;
+using InterviewsOrganizer.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace InterviewsOrganizer.Controllers
@@ -17,17 +20,23 @@ namespace InterviewsOrganizer.Controllers
         private readonly IUserCleanupService _userCleanupService;
         private readonly ITokenService _tokenService;
         private readonly IAuditLogService _auditLogService;
+        private readonly AppDbContext _context;
+        private readonly IEmailEncryptionService _emailEncryptionService;
 
         public AdminController(
             UserManager<AppUser> userManager,
             IUserCleanupService userCleanupService,
             ITokenService tokenService,
-            IAuditLogService auditLogService)
+            IAuditLogService auditLogService,
+            AppDbContext context,
+            IEmailEncryptionService emailEncryptionService)
         {
             _userManager = userManager;
             _userCleanupService = userCleanupService;
             _tokenService = tokenService;
             _auditLogService = auditLogService;
+            _context = context;
+            _emailEncryptionService = emailEncryptionService;
         }
 
         /// <summary>
@@ -36,7 +45,11 @@ namespace InterviewsOrganizer.Controllers
         [HttpPost("users")]
         public async Task<IActionResult> CreateUser(CreateUserDto dto)
         {
-            var user = new AppUser { UserName = dto.Email, Email = dto.Email, EmailConfirmed = true };
+            var emailHash = _emailEncryptionService.ComputeEmailHash(dto.Email);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.EmailHash == emailHash);
+            if (existingUser is not null) return BadRequest("Email is already registered.");
+
+            var user = new AppUser { UserName = $"user_{Guid.NewGuid()}", Email = dto.Email, EmailConfirmed = true };
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded) return BadRequest(result.Errors);
 
@@ -79,7 +92,8 @@ namespace InterviewsOrganizer.Controllers
         [HttpPost("impersonate")]
         public async Task<IActionResult> Impersonate(ImpersonateDto dto, CancellationToken cancellationToken)
         {
-            var targetUser = await _userManager.FindByEmailAsync(dto.TargetEmail);
+            var targetEmailHash = _emailEncryptionService.ComputeEmailHash(dto.TargetEmail);
+            var targetUser = await _context.Users.FirstOrDefaultAsync(u => u.EmailHash == targetEmailHash, cancellationToken);
             if (targetUser is null) return NotFound("Target user not found.");
 
             var adminUserId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;

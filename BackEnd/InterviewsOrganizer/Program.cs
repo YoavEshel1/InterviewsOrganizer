@@ -6,10 +6,13 @@ using InterviewsOrganizer.Repositories.Interfaces;
 using InterviewsOrganizer.Services;
 using InterviewsOrganizer.Services.Interfaces;
 using InterviewsOrganizer.Swagger;
+using InterviewsOrganizer.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
@@ -36,7 +39,21 @@ try
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<AppUser, IdentityRole>()
+// Data Protection key ring is persisted to a shared filesystem directory so that both the API and the
+// EmailHasher CLI (and any future instances) produce/decrypt identical ciphertext for AppUser emails.
+var keyRingPath = builder.Configuration["EmailEncryption:KeyRingPath"] ?? "../keys";
+builder.Services.AddDataProtection()
+    .SetApplicationName("InterviewsOrganizer")
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, keyRingPath)));
+
+builder.Services.AddSingleton<IEmailEncryptionService, EmailEncryptionService>();
+
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+{
+    // Email is encrypted at rest; Identity's built-in unique-email enforcement operates on plaintext
+    // and cannot be used. Uniqueness is instead enforced via the EmailHash blind index.
+    options.User.RequireUniqueEmail = false;
+})
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -144,9 +161,22 @@ builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-// Seed super admin on startup
+// Seed super admin on startup.
+// Migration ordering is critical for the encrypted-email backfill to be safe:
+//   1. Apply the "AddEmailEncryptionColumns" migration (adds EmailHash/EmailEncryptedAt, non-unique index only).
+//   2. Run EmailEncryptionMigrator to encrypt legacy plaintext emails, compute EmailHash, and scrub email-like UserNames.
+//   3. Apply the remaining migrations (including the one that adds the unique index on EmailHash),
+//      now that every row has a non-empty, populated hash.
+//   4. Seed roles/super-admin using EmailHash lookups.
 using (var scope = app.Services.CreateScope())
 {
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var migrator = dbContext.GetInfrastructure().GetRequiredService<Microsoft.EntityFrameworkCore.Migrations.IMigrator>();
+
+    await migrator.MigrateAsync("AddEmailEncryptionColumns");
+    await EmailEncryptionMigrator.RunAsync(scope.ServiceProvider);
+    await dbContext.Database.MigrateAsync();
+
     await DbSeeder.SeedSuperAdminAsync(scope.ServiceProvider);
 }
 

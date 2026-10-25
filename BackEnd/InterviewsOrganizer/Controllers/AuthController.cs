@@ -1,9 +1,12 @@
+using InterviewsOrganizer.Data;
 using InterviewsOrganizer.Models.DTOs;
 using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Services.Interfaces;
+using InterviewsOrganizer.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 
 namespace InterviewsOrganizer.Controllers
@@ -15,17 +18,25 @@ namespace InterviewsOrganizer.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenService _tokenService;
+        private readonly AppDbContext _context;
+        private readonly IEmailEncryptionService _emailEncryptionService;
 
-        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService)
+        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, AppDbContext context, IEmailEncryptionService emailEncryptionService)
         {
             _userManager = userManager;
             _tokenService = tokenService;
+            _context = context;
+            _emailEncryptionService = emailEncryptionService;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
-            var user = new AppUser { UserName = dto.Email, Email = dto.Email };
+            var emailHash = _emailEncryptionService.ComputeEmailHash(dto.Email);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.EmailHash == emailHash);
+            if (existingUser is not null) return BadRequest("Email is already registered.");
+
+            var user = new AppUser { UserName = $"user_{Guid.NewGuid()}", Email = dto.Email };
             var result = await _userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded) return BadRequest(result.Errors);
             return Ok();
@@ -34,7 +45,8 @@ namespace InterviewsOrganizer.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(dto.Email);
+            var emailHash = _emailEncryptionService.ComputeEmailHash(dto.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.EmailHash == emailHash);
             if (user is null || !await _userManager.CheckPasswordAsync(user, dto.Password))
                 return Unauthorized("Invalid credentials.");
 

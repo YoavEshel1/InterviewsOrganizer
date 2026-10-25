@@ -1,10 +1,7 @@
 ﻿using Azure.Identity;
 using InterviewsOrganizer.Services.Interfaces;
-
 using Azure.AI.Projects;
-using Azure.AI.Projects.Agents;
 using Azure.AI.Extensions.OpenAI;
-using Azure.Identity;
 using OpenAI.Responses;
 
 namespace InterviewsOrganizer.Services

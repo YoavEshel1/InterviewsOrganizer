@@ -1,5 +1,7 @@
 using InterviewsOrganizer.Models.Entities;
+using InterviewsOrganizer.Shared;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace InterviewsOrganizer.Data
 {
@@ -9,6 +11,8 @@ namespace InterviewsOrganizer.Data
         {
             var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var dbContext = serviceProvider.GetRequiredService<AppDbContext>();
+            var emailEncryptionService = serviceProvider.GetRequiredService<IEmailEncryptionService>();
 
             // Create roles if they don't exist
             string[] roles = ["SuperAdmin", "Admin", "User"];
@@ -20,12 +24,13 @@ namespace InterviewsOrganizer.Data
 
             // Create super admin if doesn't exist
             var superAdminEmail = "superadmin@interviewsorganizer.com";
-            var superAdmin = await userManager.FindByEmailAsync(superAdminEmail);
+            var superAdminEmailHash = emailEncryptionService.ComputeEmailHash(superAdminEmail);
+            var superAdmin = await dbContext.Users.FirstOrDefaultAsync(u => u.EmailHash == superAdminEmailHash);
             if (superAdmin is null)
             {
                 superAdmin = new AppUser
                 {
-                    UserName = superAdminEmail,
+                    UserName = $"user_{Guid.NewGuid()}",
                     Email = superAdminEmail,
                     EmailConfirmed = true
                 };

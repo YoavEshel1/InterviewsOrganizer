@@ -16,3 +16,9 @@ BackEnd/InterviewsOrganizer/Logs/
 /tasks
 /.vs/CopilotSnapshots
 /testings
+/BackEnd/InterviewsOrganizer.EmailHasher/bin/Debug/net10.0
+/BackEnd/InterviewsOrganizer.EmailHasher/obj/Debug/net10.0
+/BackEnd/InterviewsOrganizer.EmailHasher/obj
+/BackEnd/InterviewsOrganizer.Shared/bin/Debug/net10.0
+/BackEnd/InterviewsOrganizer.Shared/obj
+/BackEnd/keys/key-14b63214-4efd-4111-b5ec-a2353224d506.xml

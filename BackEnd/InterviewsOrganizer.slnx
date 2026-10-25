@@ -4,4 +4,6 @@
   </Folder>
   <Project Path="../Tools/CompanyListExtractor/CompanyListExtractor/CompanyListExtractor.csproj" />
   <Project Path="InterviewsOrganizer/InterviewsOrganizer.csproj" />
+  <Project Path="InterviewsOrganizer.Shared/InterviewsOrganizer.Shared.csproj" />
+  <Project Path="InterviewsOrganizer.EmailHasher/InterviewsOrganizer.EmailHasher.csproj" />
 </Solution>
