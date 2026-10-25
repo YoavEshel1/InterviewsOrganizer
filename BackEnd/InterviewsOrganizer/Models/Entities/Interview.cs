@@ -2,7 +2,7 @@
 
 namespace InterviewsOrganizer.Models.Entities
 {
-    public class Interview
+    public class Interview : IAuditableEntity
     {
         public Guid Id { get; set; }
         public DateTime Date { get; set; }
@@ -11,5 +11,7 @@ namespace InterviewsOrganizer.Models.Entities
         public string? Interviewer { get; set; }
         public string? Notes { get; set; }
         public required string UserId { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace InterviewsOrganizer.Models.Entities
 {
-    public class Position
+    public class Position : IAuditableEntity
     {
         public Guid Id { get; set; }
         public required string Title { get; set; }
@@ -12,5 +12,7 @@ namespace InterviewsOrganizer.Models.Entities
         public Guid CompanyId { get; set; }
         public required string UserId { get; set; }
         public List<Interview>? Interviews { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
     }
 }
