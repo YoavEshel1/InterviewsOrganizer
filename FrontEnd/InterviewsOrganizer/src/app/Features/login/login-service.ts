@@ -6,6 +6,7 @@ import { AuthService } from '../../core/auth/auth.service';
 @Injectable() //only for login components
 export class LoginService {
   private readonly authService = inject(AuthService);
+  readonly loggedIn = this.authService.isAuthenticated;
 
   login(email: string, password: string): Observable<void> {
     return this.authService.login(email, password).pipe(map(() => undefined));

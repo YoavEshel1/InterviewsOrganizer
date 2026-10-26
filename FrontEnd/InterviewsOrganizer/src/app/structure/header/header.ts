@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Navbar } from "../navbar/navbar";
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -8,5 +9,6 @@ import { Navbar } from "../navbar/navbar";
   styleUrl: './header.scss',
 })
 export class Header {
-
+  private readonly authService = inject(AuthService);
+  readonly loggedIn = this.authService.isAuthenticated;
 }
