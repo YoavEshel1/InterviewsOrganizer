@@ -1,5 +1,5 @@
 {
-  "name": "interviews-organizer",
+  "name": "interview-organizer",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",

@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "InterviewsOrganizer": {
+    "InterviewOrganizer": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -64,10 +64,10 @@
           },
           "configurations": {
             "production": {
-              "buildTarget": "InterviewsOrganizer:build:production"
+              "buildTarget": "InterviewOrganizer:build:production"
             },
             "development": {
-              "buildTarget": "InterviewsOrganizer:build:development"
+              "buildTarget": "InterviewOrganizer:build:development"
             }
           },
           "defaultConfiguration": "development"
