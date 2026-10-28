@@ -1,33 +1,121 @@
-.login-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
+:host {
+  display: block;
+}
+
+.login-page {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 24px 16px;
+  background:
+    radial-gradient(60rem 40rem at 10% -10%,
+      color-mix(in srgb, var(--mat-sys-primary) 14%, transparent),
+      transparent 60%),
+    radial-gradient(50rem 35rem at 110% 110%,
+      color-mix(in srgb, var(--mat-sys-tertiary) 12%, transparent),
+      transparent 60%),
+    var(--mat-sys-surface);
 }
 
 .login-card {
+  --mat-card-elevated-container-shape: 28px;
+  --mat-card-elevated-container-color: var(--mat-sys-surface-container-lowest);
+  --mat-card-elevated-container-elevation:
+    0 1px 3px rgb(0 0 0 / 0.06), 0 16px 40px rgb(0 0 0 / 0.08);
+  --mat-form-field-outlined-container-shape: 12px;
+  --mat-button-filled-container-shape: 12px;
+  --mat-button-filled-container-height: 52px;
+  --mat-progress-spinner-active-indicator-color: currentColor;
+
   width: 100%;
-  max-width: 400px;
-  padding: 16px 8px;
-  border-radius: 16px !important;
+  max-width: 420px;
+  padding: 40px 32px 32px;
+}
 
-  mat-card-header {
-    margin-bottom: 24px;
+.login-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  text-align: center;
+}
 
-    mat-card-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
+.brand-badge {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 8px;
+  border-radius: 16px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+
+  mat-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 28px;
   }
 }
 
-.full-width {
-  width: 100%;
+.login-title {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+  color: var(--mat-sys-on-surface);
+}
+
+.login-subtitle {
+  margin: 0;
+  font: var(--mat-sys-body-large);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+  font: var(--mat-sys-body-medium);
+
+  mat-icon {
+    flex: none;
+  }
 }
 
 .submit-btn {
-  margin-top: 8px;
-  height: 44px;
-  font-size: 1rem;
-  letter-spacing: 0.5px;
+  width: 100%;
+  margin-top: 12px;
+  letter-spacing: 0.01em;
+}
+
+.btn-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+// Replace the browser's blue autofill background with the card surface.
+input.mat-mdc-input-element:-webkit-autofill,
+input.mat-mdc-input-element:-webkit-autofill:hover,
+input.mat-mdc-input-element:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--mat-sys-on-surface);
+  -webkit-box-shadow: 0 0 0 1000px var(--mat-sys-surface-container-lowest) inset;
+  caret-color: var(--mat-sys-on-surface);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 20px 24px;
+  }
 }

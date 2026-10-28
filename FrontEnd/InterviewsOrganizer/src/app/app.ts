@@ -7,7 +7,7 @@ import { Logo } from './Features/decorations/logo/logo';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, Footer, LoginArea, Logo],
+  imports: [RouterOutlet, Header,  LoginArea, Logo],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
