@@ -1,12 +1,14 @@
-<div class="login-area">
-    <button matButton="filled" (click)="login()">Sign in</button>
+
     @if(!loggedIn()){
-        <button class="get-started"
-         matButton="filled"
-          (click)="signUp()">Get started</button>
+        <div class="login-area">
+            <button matButton="filled" (click)="login()">Sign in</button>
+            <button class="get-started" matButton="filled" (click)="signUp()">Get started</button>
+
+        </div>
+       
     }
     @else{
-        <button matButton="filled" (click)="logout()">Logout</button>
+        <button matButton="filled" (click)="logout()">Sign Out</button>
     }
    
-</div>
+

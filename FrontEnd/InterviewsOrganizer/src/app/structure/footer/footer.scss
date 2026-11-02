@@ -2,3 +2,19 @@
   display: block;
   height: 100%;
 }
+.footer-content{
+  align-items: center;
+  padding: 0 20px;
+  display:flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;  
+ 
+
+  .footer-links {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+  
+}

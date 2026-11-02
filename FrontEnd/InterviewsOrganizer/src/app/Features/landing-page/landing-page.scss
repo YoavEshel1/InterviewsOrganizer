@@ -1,0 +1,234 @@
+/* ==========================================
+   LANDING PAGE STYLES (LTR Layout)
+   ========================================== */
+
+.landing-container {
+    min-height: 100vh;
+    background: #080e1e;
+    /* Deep Navy Dark Theme */
+    color: #ffffff;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    direction: ltr;
+    /* English Left-To-Right Orientation */
+}
+
+/* Header & Navigation */
+.landing-header {
+    padding: 16px 32px;
+    background: rgba(8, 14, 30, 0.85);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+}
+
+/* Button UI Components */
+.btn {
+    font-family: inherit;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    border: none;
+    font-size: 14px;
+
+    /* Primary Action Button */
+    &.btn-primary {
+        background: linear-gradient(135deg, #0045d8 0%, #002b80 100%);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 14px rgba(0, 69, 216, 0.4);
+
+        &:hover {
+            background: linear-gradient(135deg, #0052e0 0%, #0036a3 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 69, 216, 0.6);
+        }
+    }
+
+    /* Secondary / Bordered Button */
+    &.btn-secondary {
+        background: transparent;
+        color: rgba(255, 255, 255, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
+    }
+
+    /* Large Hero Button Variant */
+    &.btn-large {
+        padding: 16px 36px;
+        font-size: 18px;
+        border-radius: 10px;
+    }
+}
+
+/* Hero Section Container */
+.hero-section {
+    padding: 64px 20px;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .hero-content {
+        max-width: 860px;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 48px;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 20px;
+        letter-spacing: -0.5px;
+
+        .highlight-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    }
+
+    .hero-subtitle {
+        font-size: 18px;
+        line-height: 1.6;
+        color: #94a3b8;
+        margin-bottom: 40px;
+        max-width: 680px;
+        margin-left: auto;
+        margin-right: auto;
+
+        strong {
+            color: #ffffff;
+        }
+    }
+}
+
+/* Video Player Frame styling */
+.video-container {
+    margin: 0 auto 40px;
+    max-width: 720px;
+
+    .video-wrapper {
+        position: relative;
+        padding-bottom: 56.25%;
+        /* Maintain 16:9 Aspect Ratio */
+        height: 0;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        background: #000000;
+
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+}
+
+/* Hero Call-To-Action Wrapper */
+.hero-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+
+    .cta-note {
+        font-size: 13px;
+        color: #64748b;
+    }
+}
+
+/* Footer Section Styling */
+.landing-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: #040711;
+    padding: 40px 32px 24px;
+
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+        text-align: center;
+    }
+
+    .footer-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .footer-tagline {
+        color: #64748b;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .footer-links {
+        display: flex;
+        gap: 24px;
+
+        a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+
+            &:hover {
+                color: #ffffff;
+            }
+        }
+    }
+
+    .footer-copy {
+        color: #475569;
+        font-size: 13px;
+        margin-top: 8px;
+    }
+}
+
+/* Mobile & Tablet Responsive Adjustments */
+@media (max-width: 768px) {
+    .hero-section .hero-title {
+        font-size: 32px;
+    }
+
+    .hero-section .hero-subtitle {
+        font-size: 16px;
+    }
+
+    .btn.btn-large {
+        width: 100%;
+    }
+}

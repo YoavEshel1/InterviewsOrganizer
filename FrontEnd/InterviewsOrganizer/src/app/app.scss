@@ -1,11 +1,13 @@
 .main-container {
     display: flex;
-    flex-direction: column;    
-    overflow-y: hidden;
-    margin:5px 10px;
-    
+    flex-direction: column;        
 
     .header {
+        padding: 0 10px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: var(--color-bg);
         flex-shrink: 0;
         height: 80px;
         width: 100%;
@@ -16,10 +18,9 @@
         align-items: center;
     }
 
-    .main-area {
-        margin-top: 10px;
+    .main-area {        
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         min-height: 85vh;
     }
 
