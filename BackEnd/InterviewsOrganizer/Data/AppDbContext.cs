@@ -1,4 +1,5 @@
-﻿using InterviewsOrganizer.Models.Entities;
+﻿using InterviewsOrganizer.Data.Configurations;
+using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Services.Interfaces;
 using InterviewsOrganizer.Shared;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -16,6 +17,7 @@ namespace InterviewsOrganizer.Data
         public DbSet<Company> Companies => Set<Company>();
         public DbSet<Position> Positions => Set<Position>();
         public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+        public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -105,6 +107,8 @@ namespace InterviewsOrganizer.Data
 
             modelBuilder.Entity<Interview>()
                 .HasQueryFilter(i => _currentUserService.UserId == null || i.UserId == _currentUserService.UserId);
+
+            modelBuilder.ApplyConfiguration(new UserProfileConfiguration());
         }
     }
 }

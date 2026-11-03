@@ -1,13 +1,7 @@
-using InterviewsOrganizer.Data;
 using InterviewsOrganizer.Models.DTOs;
-using InterviewsOrganizer.Models.Entities;
 using InterviewsOrganizer.Services.Interfaces;
-using InterviewsOrganizer.Shared;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
 
 namespace InterviewsOrganizer.Controllers
 {
@@ -16,97 +10,58 @@ namespace InterviewsOrganizer.Controllers
     [AllowAnonymous]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
-        private readonly ITokenService _tokenService;
-        private readonly AppDbContext _context;
-        private readonly IEmailEncryptionService _emailEncryptionService;
+        private readonly IAuthService _authService;
 
-        public AuthController(UserManager<AppUser> userManager, ITokenService tokenService, AppDbContext context, IEmailEncryptionService emailEncryptionService)
+        public AuthController(IAuthService authService)
         {
-            _userManager = userManager;
-            _tokenService = tokenService;
-            _context = context;
-            _emailEncryptionService = emailEncryptionService;
+            _authService = authService;
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDto dto)
+        public async Task<IActionResult> Register(RegisterDto dto, CancellationToken ct)
         {
-            var emailHash = _emailEncryptionService.ComputeEmailHash(dto.Email);
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.EmailHash == emailHash);
-            if (existingUser is not null) return BadRequest("Email is already registered.");
+            var response = await _authService.RegisterAsync(dto, ct);
 
-            var user = new AppUser { UserName = $"user_{Guid.NewGuid()}", Email = dto.Email };
-            var result = await _userManager.CreateAsync(user, dto.Password);
-            if (!result.Succeeded) return BadRequest(result.Errors);
-            return Ok();
+            if (!response.Success)
+            {
+                return BadRequest(response.ErrorMessage);
+            }
+
+            return Ok(response.Profile);
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        public async Task<IActionResult> Login([FromBody] LoginDto dto, CancellationToken ct)
         {
-            var emailHash = _emailEncryptionService.ComputeEmailHash(dto.Email);
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.EmailHash == emailHash);
-            if (user is null || !await _userManager.CheckPasswordAsync(user, dto.Password))
-                return Unauthorized("Invalid credentials.");
+            var result = await _authService.LoginAsync(dto, ct);
+            if (!result.Success || result.Tokens is null)
+                return Unauthorized(result.ErrorMessage);
 
-            var roles = await _userManager.GetRolesAsync(user);
-            var accessToken = _tokenService.GenerateAccessToken(user, roles);
-            var refreshToken = GenerateRefreshToken();
+            SetRefreshTokenCookie(result.Tokens.RefreshToken);
 
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
-            await _userManager.UpdateAsync(user);
-
-            SetRefreshTokenCookie(refreshToken);
-
-            return Ok(new { accessToken });
+            return Ok(new { accessToken = result.Tokens.AccessToken });
         }
-    
+
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh()
+        public async Task<IActionResult> Refresh(CancellationToken ct)
         {
             var refreshToken = Request.Cookies["refreshToken"];
-            if (string.IsNullOrEmpty(refreshToken)) return Unauthorized();
+            var result = await _authService.RefreshAsync(refreshToken, ct);
+            if (!result.Success || result.Tokens is null)
+                return Unauthorized(result.ErrorMessage);
 
-            var user = _userManager.Users.SingleOrDefault(u => u.RefreshToken == refreshToken);
-            if (user is null || user.RefreshTokenExpiry < DateTime.UtcNow)
-                return Unauthorized();
+            SetRefreshTokenCookie(result.Tokens.RefreshToken);
 
-            var roles = await _userManager.GetRolesAsync(user);
-            var newAccessToken = _tokenService.GenerateAccessToken(user, roles);
-            var newRefreshToken = GenerateRefreshToken();
-
-            user.RefreshToken = newRefreshToken;
-            user.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
-            await _userManager.UpdateAsync(user);
-
-            SetRefreshTokenCookie(newRefreshToken);
-
-            return Ok(new { accessToken = newAccessToken });
+            return Ok(new { accessToken = result.Tokens.AccessToken });
         }
 
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout(CancellationToken ct)
         {
             var refreshToken = Request.Cookies["refreshToken"];
-            if (!string.IsNullOrEmpty(refreshToken))
-            {
-                var user = _userManager.Users.SingleOrDefault(u => u.RefreshToken == refreshToken);
-                if (user is not null)
-                {
-                    user.RefreshToken = null;
-                    user.RefreshTokenExpiry = null;
-                    await _userManager.UpdateAsync(user);
-                }
-            }
+            await _authService.LogoutAsync(refreshToken, ct);
             Response.Cookies.Delete("refreshToken");
             return Ok();
-        }
-
-        private static string GenerateRefreshToken()
-        {
-            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
         }
 
         private void SetRefreshTokenCookie(string refreshToken)

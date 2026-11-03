@@ -12,19 +12,22 @@ namespace InterviewsOrganizer.Services
         private readonly IInterviewService _interviewService;
         private readonly IPositionService _positionService;
         private readonly ICompanyService _companyService;
+        private readonly IUserProfileService _userProfileService;
 
         public UserCleanupService(
             AppDbContext context,
             UserManager<AppUser> userManager,
             IInterviewService interviewService,
             IPositionService positionService,
-            ICompanyService companyService)
+            ICompanyService companyService,
+            IUserProfileService userProfileService)
         {
             _context = context;
             _userManager = userManager;
             _interviewService = interviewService;
             _positionService = positionService;
             _companyService = companyService;
+            _userProfileService = userProfileService;
         }
 
         public async Task<IdentityResult> DeleteUserAndDataAsync(string userId, CancellationToken cancellationToken = default)
@@ -38,6 +41,10 @@ namespace InterviewsOrganizer.Services
             await _interviewService.DeleteByUserIdAsync(userId, cancellationToken);
             await _positionService.DeleteByUserIdAsync(userId, cancellationToken);
             await _companyService.DeleteByUserIdAsync(userId, cancellationToken);
+
+            // GDPR Article 17: anonymize + remove UserProfile PII explicitly (cascade delete
+            // would also remove the row, but this keeps the wipe auditable and explicit).
+            await _userProfileService.DeleteUserDataGdprAsync(userId, cancellationToken);
 
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
