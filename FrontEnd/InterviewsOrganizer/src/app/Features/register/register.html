@@ -1,0 +1,83 @@
+<main class="login-page" dir="ltr">
+  <mat-card class="login-card">
+    <header class="login-header">
+      <span class="brand-badge">
+        <mat-icon svgIcon="lf-user-plus" />
+      </span>
+      <h1 class="login-title">Create your account</h1>
+      <p class="login-subtitle">Start organizing your interviews</p>
+    </header>
+
+    <form class="login-form" (submit)="onSubmit($event)" novalidate>
+      <div class="name-row">
+        <mat-form-field appearance="outline">
+          <mat-label>First name</mat-label>
+          <mat-icon matPrefix svgIcon="lf-user" />
+          <input matInput type="text" autocomplete="given-name" [formField]="registerForm.firstName"
+            [errorStateMatcher]="matchers.firstName" />
+          @if (registerForm.firstName().errors()[0]; as error) {
+          <mat-error>{{ error.message }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Last name</mat-label>
+          <input matInput type="text" autocomplete="family-name" [formField]="registerForm.lastName"
+            [errorStateMatcher]="matchers.lastName" />
+          @if (registerForm.lastName().errors()[0]; as error) {
+          <mat-error>{{ error.message }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email address</mat-label>
+        <mat-icon matPrefix svgIcon="lf-mail" />
+        <input matInput type="email" autocomplete="username" [formField]="registerForm.email"
+          [errorStateMatcher]="matchers.email" />
+        @if (registerForm.email().errors()[0]; as error) {
+        <mat-error>{{ error.message }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <mat-icon matPrefix svgIcon="lf-lock" />
+        <input matInput autocomplete="new-password" [type]="hidePassword() ? 'password' : 'text'"
+          [formField]="registerForm.password" [errorStateMatcher]="matchers.password" />
+        <button matIconButton matSuffix type="button" (click)="hidePassword.set(!hidePassword())"
+          [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'" [attr.aria-pressed]="!hidePassword()">
+          <mat-icon [svgIcon]="hidePassword() ? 'lf-eye' : 'lf-eye-off'" />
+        </button>
+        @for (error of registerForm.password().errors(); track error.kind) {
+        <mat-error>{{ error.message }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Confirm password</mat-label>
+        <mat-icon matPrefix svgIcon="lf-lock" />
+        <input matInput autocomplete="new-password" [type]="hidePassword() ? 'password' : 'text'"
+          [formField]="registerForm.confirmPassword" [errorStateMatcher]="matchers.confirmPassword" />
+        <button matIconButton matSuffix type="button" (click)="hidePassword.set(!hidePassword())"
+            [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'" [attr.aria-pressed]="!hidePassword()">
+            <mat-icon [svgIcon]="hidePassword() ? 'lf-eye' : 'lf-eye-off'" />
+        </button>
+        @if (registerForm.confirmPassword().errors()[0]; as error) {
+        <mat-error>{{ error.message }}</mat-error>
+        }
+      </mat-form-field>
+
+      <button matButton="filled" type="submit" class="submit-btn" [disabled]="registerForm().submitting()">
+        <span class="btn-content">
+          @if (registerForm().submitting()) {
+          <mat-spinner diameter="20" />
+          <span>Creating account...</span>
+          } @else {
+          <span>Create account</span>
+          }
+        </span>
+      </button>
+    </form>
+  </mat-card>
+</main>

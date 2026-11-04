@@ -25,7 +25,7 @@ export class LoginArea {
   login() {
     this.router.navigate(['/login']);
   }
-  
+
   signUp() {
     this.router.navigate(['/signup']);
   }

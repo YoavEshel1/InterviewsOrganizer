@@ -3,6 +3,7 @@ import { Routes, Router, CanActivateFn } from '@angular/router';
 import { CompanyForm } from './Features/company/company-form/company-form';
 import { LandingPage } from './Features/landing-page/landing-page';
 import { LoginForm } from './Features/login/login-form/login-form';
+import { Register } from './Features/register/register';
 import { MainArea } from './structure/main-area/main-area';
 import { authGuard } from './core/auth/auth.guard';
 import { AuthService } from './core/auth/auth.service';
@@ -50,6 +51,12 @@ export const routes: Routes = [
     {
         path: 'login',
         component: LoginForm,
+    },
+
+    // Registration Page
+    {
+        path: 'signup',
+        component: Register,
     },
 
     // Wildcard fallback
