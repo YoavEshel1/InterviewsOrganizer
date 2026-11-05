@@ -2,6 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, catchError, finalize, firstValueFrom, tap, throwError } from 'rxjs';
+import { UserProfile } from './user-profile';
 
 export interface LoginResponse {
   token: string;
@@ -22,6 +23,15 @@ export class AuthService {
   private readonly _accessToken = signal<string | null>(null);
   readonly accessToken = this._accessToken.asReadonly();
   readonly isAuthenticated = computed(() => this._accessToken() !== null);
+
+  private readonly _userProfile = signal<UserProfile | null>(null);
+  readonly userProfile = this._userProfile.asReadonly();
+
+  /** Signs the user in from an auth response (e.g. right after registration). */
+  setAuthenticatedUser(profile: UserProfile, token: string): void {
+    this._userProfile.set(profile);
+    this.setToken(token);
+  }
 
   /** Restores the session on app startup using the HttpOnly refresh-token cookie. */
   async restoreSession(): Promise<void> {
@@ -69,6 +79,9 @@ export class AuthService {
   private setToken(token: string | null): void {
     clearTimeout(this.refreshTimer);
     this._accessToken.set(token);
+    if (token === null) {
+      this._userProfile.set(null);
+    }
 
     const expiresAt = token ? this.getExpiry(token) : null;
     if (expiresAt === null) {

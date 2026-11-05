@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { ErrorStateMatcher } from '@angular/material/core';
@@ -12,6 +12,9 @@ import { Router } from '@angular/router';
 import { email, form, FormField, minLength, required, submit, validate } from '@angular/forms/signals';
 import type { FieldTree } from '@angular/forms/signals';
 import { firstValueFrom } from 'rxjs';
+import { NgxTurnstileComponent } from 'ngx-turnstile';
+import { AuthService } from '../../core/auth/auth.service';
+import { environment } from '../../../environments/environment';
 import { LOGIN_ICONS } from '../login/login-form/login-icons';
 import { RegisterData } from './models/registerData';
 import { RegisterService } from './register-service';
@@ -38,6 +41,7 @@ const PASSWORD_RULES = [
     MatCardModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    NgxTurnstileComponent,
   ],
   templateUrl: './register.html',
   styleUrls: ['../login/login-form/login-form.scss', './register.scss'],
@@ -45,7 +49,11 @@ const PASSWORD_RULES = [
 export class Register {
   private readonly registerService = inject(RegisterService);
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
+  private readonly turnstile = viewChild(NgxTurnstileComponent);
 
+  protected readonly siteKey = environment.turnstile.siteKey;
+  protected readonly turnstileToken = signal<string | null>(null);
   protected readonly hidePassword = signal(true);
 
   protected readonly registerModel = signal<RegisterData>({
@@ -103,11 +111,26 @@ export class Register {
     // submit() touches every field and only runs the action when the form is valid.
     // Errors returned from the action are attached to the given field.
     void submit(this.registerForm, async () => {
+      const turnstileToken = this.turnstileToken();
+      if (!turnstileToken) {
+        return {
+          fieldTree: this.registerForm.confirmPassword,
+          kind: 'turnstile',
+          message: 'Please complete the human verification.',
+        };
+      }
+
       try {
-        await firstValueFrom(this.registerService.register(this.registerModel()));
-        await this.router.navigate(['/login']);
+        const { profile, accessToken } = await firstValueFrom(
+          this.registerService.register(this.registerModel(), turnstileToken),
+        );
+        this.authService.setAuthenticatedUser(profile, accessToken);
+        await this.router.navigate(['/companies']);
         return undefined;
       } catch (error) {
+        // Turnstile tokens are single-use, so a new challenge is needed for the next attempt.
+        this.turnstileToken.set(null);
+        this.turnstile()?.reset();
         return {
           fieldTree: this.registerForm.confirmPassword,
           kind: 'server',
