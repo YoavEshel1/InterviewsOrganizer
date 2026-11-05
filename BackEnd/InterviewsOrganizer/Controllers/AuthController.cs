@@ -22,12 +22,14 @@ namespace InterviewsOrganizer.Controllers
         {
             var response = await _authService.RegisterAsync(dto, ct);
 
-            if (!response.Success)
+            if (!response.Success || response.Tokens is null)
             {
                 return BadRequest(response.ErrorMessage);
             }
 
-            return Ok(response.Profile);
+            SetRefreshTokenCookie(response.Tokens.RefreshToken);
+
+            return Ok(new { profile = response.Profile, accessToken = response.Tokens.AccessToken });
         }
 
         [HttpPost("login")]

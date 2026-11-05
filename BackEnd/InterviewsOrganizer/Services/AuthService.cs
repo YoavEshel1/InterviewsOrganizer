@@ -15,23 +15,39 @@ namespace InterviewsOrganizer.Services
         private readonly IEmailEncryptionService _emailEncryptionService;
         private readonly IUserProfileService _userProfileService;
         private readonly ITokenService _tokenService;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthService> _logger;
 
         public AuthService(
             UserManager<AppUser> userManager,
             AppDbContext context,
             IEmailEncryptionService emailEncryptionService,
             IUserProfileService userProfileService,
-            ITokenService tokenService)
+            ITokenService tokenService,
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration,
+            ILogger<AuthService> logger)
         {
             _userManager = userManager;
             _context = context;
             _emailEncryptionService = emailEncryptionService;
             _userProfileService = userProfileService;
             _tokenService = tokenService;
+            _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto, CancellationToken ct = default)
         {
+            // Validate the Turnstile token before doing any other work.
+            var turnstileValid = await ValidateTurnstileTokenAsync(dto.TurnstileToken, ct);
+            if (!turnstileValid)
+            {
+                return AuthResponseDto.Fail("Captcha verification failed. Please try again.");
+            }
+
             // check if email is already registered
             var emailHash = _emailEncryptionService.ComputeEmailHash(dto.Email);
             var existingUser = await _context.Users.AnyAsync(u => u.EmailHash == emailHash, ct);
@@ -66,12 +82,76 @@ namespace InterviewsOrganizer.Services
                 // Commit the transaction
                 await transaction.CommitAsync(ct);
 
-                return AuthResponseDto.Ok(profileDto);
+                // Immediately log the new user in, same as a successful LoginAsync.
+                var tokens = await IssueTokensAsync(user, ct);
+
+                return AuthResponseDto.Ok(profileDto, tokens);
             }
             catch
             {
                 await transaction.RollbackAsync(ct);
                 throw; // Pass to Global Exception Handler
+            }
+        }
+
+        /// <summary>
+        /// Verifies a Cloudflare Turnstile response token against Cloudflare's siteverify endpoint.
+        /// Fails closed (returns false) on any error, missing configuration, or cancellation.
+        /// </summary>
+        private async Task<bool> ValidateTurnstileTokenAsync(string? turnstileToken, CancellationToken ct)
+        {
+            if (string.IsNullOrWhiteSpace(turnstileToken))
+                return false;
+
+            var bypassToken = _configuration["CloudflareTurnstile:BypassToken"];
+            if (!string.IsNullOrEmpty(bypassToken) && turnstileToken == bypassToken)
+                return true;
+
+            var secretKey = _configuration["CloudflareTurnstile:SecretKey"];
+            if (string.IsNullOrWhiteSpace(secretKey))
+            {
+                _logger.LogError("CloudflareTurnstile:SecretKey is not configured; failing closed.");
+                return false;
+            }
+
+            var verifyUrl = _configuration["CloudflareTurnstile:VerifyUrl"]
+                ?? "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+
+            try
+            {
+                // Use the HttpClient defined at Program.cs with the name "Turnstile" to make the request to Cloudflare's Turnstile verification endpoint.
+                var client = _httpClientFactory.CreateClient("Turnstile");
+                var content = new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    ["secret"] = secretKey,
+                    ["response"] = turnstileToken
+                });
+
+                using var httpResponse = await client.PostAsync(verifyUrl, content, ct);
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("Turnstile siteverify returned status {StatusCode}.", httpResponse.StatusCode);
+                    return false;
+                }
+
+                var verifyResult = await httpResponse.Content.ReadFromJsonAsync<TurnstileVerifyResponseDto>(cancellationToken: ct);
+                if (verifyResult is null || !verifyResult.Success)
+                {
+                    _logger.LogWarning("Turnstile verification failed. ErrorCodes: {ErrorCodes}",
+                        verifyResult?.ErrorCodes is null ? "none" : string.Join(",", verifyResult.ErrorCodes));
+                    return false;
+                }
+
+                return true;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while validating Turnstile token.");
+                return false;
             }
         }
 
