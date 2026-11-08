@@ -60,6 +60,13 @@ try
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
+    // Password reset tokens (generated via UserManager.GeneratePasswordResetTokenAsync) must expire
+    // quickly since they are emailed to the user; 15 minutes balances usability and security.
+    builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+    {
+        options.TokenLifespan = TimeSpan.FromMinutes(15);
+    });
+
     builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

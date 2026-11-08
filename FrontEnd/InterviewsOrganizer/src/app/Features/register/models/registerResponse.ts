@@ -1,5 +1,5 @@
 
-import { UserProfile } from '../../../core/auth/user-profile';
+import { UserProfile } from '../../../core/auth/models/user-profile';
 
 export interface RegisterResponse {
     profile: UserProfile;

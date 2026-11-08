@@ -18,6 +18,7 @@ namespace InterviewsOrganizer.Services
         private readonly ILogger<AzureEmailService> _logger;
 
         private const string WelcomeTemplateRelativePath = "Templates/WelcomeEmail.html";
+        private const string PasswordResetTemplateRelativePath = "Templates/PasswordResetEmail.html";
 
         public AzureEmailService(
             EmailClient emailClient,
@@ -71,6 +72,45 @@ namespace InterviewsOrganizer.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error while sending welcome email to {Recipient}.", toAddress);
+            }
+        }
+
+        public async Task SendPasswordResetEmailAsync(string toAddress, string resetUrl, CancellationToken ct = default)
+        {
+            try
+            {
+                var templatePath = Path.Combine(_environment.ContentRootPath, PasswordResetTemplateRelativePath);
+                var htmlBody = await File.ReadAllTextAsync(templatePath, ct);
+
+                htmlBody = htmlBody.Replace("{{ResetUrl}}", resetUrl);
+
+                var emailMessage = new EmailMessage(
+                    senderAddress: _options.SenderAddress,
+                    recipientAddress: toAddress,
+                    content: new EmailContent("Reset your Interviews Organizer password")
+                    {
+                        Html = htmlBody
+                    });
+
+                // Explicit No-Reply pattern: replies are never expected, so ReplyTo is left
+                // pointing at the same no-reply sender address rather than a monitored mailbox.
+                emailMessage.ReplyTo.Add(new EmailAddress(_options.SenderAddress));
+
+                // Fire the send request and wait until Azure accepts/completes the operation,
+                // but this call itself runs on a background Task (see AuthService), so it
+                // never blocks the original HTTP response to the client.
+                await _emailClient.SendAsync(WaitUntil.Completed, emailMessage, ct);
+
+                _logger.LogInformation("Password reset email sent to {Recipient}.", toAddress);
+            }
+            catch (RequestFailedException ex)
+            {
+                // Email delivery failures must never break the forgot-password flow; log and move on.
+                _logger.LogError(ex, "Failed to send password reset email to {Recipient} via Azure Communication Services.", toAddress);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while sending password reset email to {Recipient}.", toAddress);
             }
         }
     }

@@ -66,6 +66,33 @@ namespace InterviewsOrganizer.Controllers
             return Ok();
         }
 
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto, CancellationToken ct)
+        {
+            var result = await _authService.ForgotPasswordAsync(dto, ct);
+
+            // Only a Turnstile failure is surfaced as an error; an unknown email still yields
+            // a successful response to prevent user enumeration.
+            if (!result.Success)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDto dto, CancellationToken ct)
+        {
+            var result = await _authService.ResetPasswordAsync(dto, ct);
+            if (!result.Success)
+            {
+                return BadRequest(result.ErrorMessage);
+            }
+
+            return Ok();
+        }
+
         private void SetRefreshTokenCookie(string refreshToken)
         {
             Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions

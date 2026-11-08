@@ -4,6 +4,8 @@ import { CompanyForm } from './Features/company/company-form/company-form';
 import { LandingPage } from './Features/landing-page/landing-page';
 import { LoginForm } from './Features/login/login-form/login-form';
 import { Register } from './Features/register/register';
+import { ForgotPassword } from './Features/forgot-password/forgot-password';
+import { ResetPassword } from './Features/reset-password/reset-password';
 import { MainArea } from './structure/main-area/main-area';
 import { authGuard } from './core/auth/auth.guard';
 import { AuthService } from './core/auth/auth.service';
@@ -57,6 +59,16 @@ export const routes: Routes = [
     {
         path: 'signup',
         component: Register,
+    },
+
+    // Password reset
+    {
+        path: 'forgot-password',
+        component: ForgotPassword,
+    },
+    {
+        path: 'reset-password',
+        component: ResetPassword,
     },
 
     // Wildcard fallback

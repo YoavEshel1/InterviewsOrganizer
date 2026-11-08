@@ -13,5 +13,13 @@ namespace InterviewsOrganizer.Services.Interfaces
         /// <param name="firstName">Recipient first name, used for personalization.</param>
         /// <param name="ct">Cancellation token.</param>
         Task SendWelcomeEmailAsync(string toAddress, string firstName, CancellationToken ct = default);
+
+        /// <summary>
+        /// Sends the password reset email containing a link to complete the reset.
+        /// </summary>
+        /// <param name="toAddress">Recipient email address.</param>
+        /// <param name="resetUrl">Fully-formed URL the user follows to reset their password.</param>
+        /// <param name="ct">Cancellation token.</param>
+        Task SendPasswordResetEmailAsync(string toAddress, string resetUrl, CancellationToken ct = default);
     }
 }

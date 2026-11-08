@@ -21,5 +21,16 @@ namespace InterviewsOrganizer.Services.Interfaces
         /// Invalidates the given refresh token (if it belongs to a user) so it can no longer be used.
         /// </summary>
         Task LogoutAsync(string? refreshToken, CancellationToken ct = default);
+
+        /// <summary>
+        /// Initiates a password reset for the given email. Always returns a successful result
+        /// unless the Turnstile token itself is invalid, to prevent user enumeration.
+        /// </summary>
+        Task<PasswordResetResultDto> ForgotPasswordAsync(ForgotPasswordDto dto, CancellationToken ct = default);
+
+        /// <summary>
+        /// Completes a password reset using a token previously issued by <see cref="ForgotPasswordAsync"/>.
+        /// </summary>
+        Task<PasswordResetResultDto> ResetPasswordAsync(ResetPasswordDto dto, CancellationToken ct = default);
     }
 }

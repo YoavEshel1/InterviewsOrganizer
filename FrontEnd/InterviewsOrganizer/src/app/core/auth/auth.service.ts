@@ -2,15 +2,12 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, catchError, finalize, firstValueFrom, tap, throwError } from 'rxjs';
-import { UserProfile } from './user-profile';
+import { UserProfile } from './models/user-profile';
+import {  ResetPasswordRequest } from './models/resetPasswordRequest';
+import { ForgotPasswordRequest } from './models/forgotPasswordRequest';
+import { LoginResponse } from './models/loginResponse';
+import { RefreshResponse } from './models/refreshResponse';
 
-export interface LoginResponse {
-  token: string;
-}
-
-export interface RefreshResponse {
-  accessToken: string;
-}
 
 const REFRESH_LEEWAY_MS = 30_000;
 
@@ -46,6 +43,14 @@ export class AuthService {
     return this.http
       .post<LoginResponse>('/api/auth/login', { email, password }, { withCredentials: true })
       .pipe(tap(res => this.setToken(res.token)));
+  }
+
+  forgotPassword(request: ForgotPasswordRequest): Observable<void> {
+    return this.http.post<void>('/api/auth/forgot-password', request);
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<void> {
+    return this.http.post<void>('/api/auth/reset-password', request);
   }
 
   logout(): Observable<void> {

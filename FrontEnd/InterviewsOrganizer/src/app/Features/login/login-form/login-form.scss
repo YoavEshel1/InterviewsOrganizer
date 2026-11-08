@@ -76,6 +76,18 @@
   gap: 4px;
 }
 
+.forgot-link {
+  align-self: flex-end;
+  margin: 0 4px 4px;
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-label-large);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .form-error {
   display: flex;
   align-items: center;

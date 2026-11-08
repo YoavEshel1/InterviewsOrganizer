@@ -1,10 +1,12 @@
 ﻿using InterviewsOrganizer.Data;
 using InterviewsOrganizer.Models.DTOs;
 using InterviewsOrganizer.Models.Entities;
+using InterviewsOrganizer.Models.Options;
 using InterviewsOrganizer.Services.Interfaces;
 using InterviewsOrganizer.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 namespace InterviewsOrganizer.Services
 {
@@ -18,6 +20,7 @@ namespace InterviewsOrganizer.Services
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
+        private readonly AzureCommunicationServicesOptions _acsOptions;
         private readonly ILogger<AuthService> _logger;
 
         public AuthService(
@@ -29,6 +32,7 @@ namespace InterviewsOrganizer.Services
             IHttpClientFactory httpClientFactory,
             IConfiguration configuration,
             IEmailService emailService,
+            IOptions<AzureCommunicationServicesOptions> acsOptions,
             ILogger<AuthService> logger)
         {
             _userManager = userManager;
@@ -39,6 +43,7 @@ namespace InterviewsOrganizer.Services
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
             _emailService = emailService;
+            _acsOptions = acsOptions.Value;
             _logger = logger;
         }
 
@@ -216,6 +221,62 @@ namespace InterviewsOrganizer.Services
         private static string GenerateRefreshToken() =>
             Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 
+        public async Task<PasswordResetResultDto> ForgotPasswordAsync(ForgotPasswordDto dto, CancellationToken ct = default)
+        {
+            // Validate the Turnstile token before doing any other work.
+            var turnstileValid = await ValidateTurnstileTokenAsync(dto.TurnstileToken, ct);
+            if (!turnstileValid)
+            {
+                return PasswordResetResultDto.Fail("Captcha verification failed. Please try again.");
+            }
 
+            var emailHash = _emailEncryptionService.ComputeEmailHash(dto.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.EmailHash == emailHash, ct);
+
+            if (user is not null)
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var resetUrl = $"{_acsOptions.BaseUrl.TrimEnd('/')}/reset-password?email={Uri.EscapeDataString(dto.Email)}&token={Uri.EscapeDataString(token)}";
+
+                // Dispatch the email on a background task so it never delays the HTTP response.
+                // Delivery failures are only logged inside AzureEmailService and never bubble up here.
+                _ = Task.Run(() => _emailService.SendPasswordResetEmailAsync(dto.Email, resetUrl, CancellationToken.None));
+            }
+
+            // Always report success regardless of whether the email matched a user, to prevent
+            // account enumeration.
+            return PasswordResetResultDto.Ok();
+        }
+
+        public async Task<PasswordResetResultDto> ResetPasswordAsync(ResetPasswordDto dto, CancellationToken ct = default)
+        {
+            // Validate the Turnstile token before doing any other work.
+            var turnstileValid = await ValidateTurnstileTokenAsync(dto.TurnstileToken, ct);
+            if (!turnstileValid)
+            {
+                return PasswordResetResultDto.Fail("Captcha verification failed. Please try again.");
+            }
+
+            var emailHash = _emailEncryptionService.ComputeEmailHash(dto.Email);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.EmailHash == emailHash, ct);
+            if (user is null)
+            {
+                return PasswordResetResultDto.Fail("Invalid or expired reset token.");
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, dto.Token, dto.NewPassword);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return PasswordResetResultDto.Fail(errors);
+            }
+
+            // Invalidate any existing refresh token as a security hardening measure after a password reset.
+            user.RefreshToken = null;
+            user.RefreshTokenExpiry = null;
+            await _userManager.UpdateAsync(user);
+
+            return PasswordResetResultDto.Ok();
+        }
     }
 }
