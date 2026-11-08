@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.AI.Extensions.OpenAI" Version="2.0.0" />
+    <PackageReference Include="Azure.Communication.Email" Version="1.1.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.1" />
@@ -37,6 +38,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\InterviewsOrganizer.Shared\InterviewsOrganizer.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Templates\WelcomeEmail.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

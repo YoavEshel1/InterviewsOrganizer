@@ -1,6 +1,8 @@
+using Azure.Communication.Email;
 using InterviewsOrganizer.Data;
 using InterviewsOrganizer.Middleware;
 using InterviewsOrganizer.Models.Entities;
+using InterviewsOrganizer.Models.Options;
 using InterviewsOrganizer.Repositories;
 using InterviewsOrganizer.Repositories.Interfaces;
 using InterviewsOrganizer.Services;
@@ -13,6 +15,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
@@ -141,6 +144,17 @@ try
     // Keeps the HttpClient instance alive for the lifetime of the application, which is more efficient than creating a new instance for each request.
     // To use it use _httpClientFactory.CreateClient("Turnstile")
     builder.Services.AddHttpClient("Turnstile");
+
+    // Azure Communication Services Email: bind options and register a singleton EmailClient,
+    // which is thread-safe and intended to be reused across requests.
+    builder.Services.Configure<AzureCommunicationServicesOptions>(
+        builder.Configuration.GetSection(AzureCommunicationServicesOptions.SectionName));
+    builder.Services.AddSingleton(sp =>
+    {
+        var acsOptions = sp.GetRequiredService<IOptions<AzureCommunicationServicesOptions>>().Value;
+        return new EmailClient(acsOptions.ConnectionString);
+    });
+    builder.Services.AddScoped<IEmailService, AzureEmailService>();
 
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();

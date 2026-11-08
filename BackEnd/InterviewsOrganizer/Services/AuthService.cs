@@ -17,6 +17,7 @@ namespace InterviewsOrganizer.Services
         private readonly ITokenService _tokenService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
         private readonly ILogger<AuthService> _logger;
 
         public AuthService(
@@ -27,6 +28,7 @@ namespace InterviewsOrganizer.Services
             ITokenService tokenService,
             IHttpClientFactory httpClientFactory,
             IConfiguration configuration,
+            IEmailService emailService,
             ILogger<AuthService> logger)
         {
             _userManager = userManager;
@@ -36,6 +38,7 @@ namespace InterviewsOrganizer.Services
             _tokenService = tokenService;
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
+            _emailService = emailService;
             _logger = logger;
         }
 
@@ -84,6 +87,12 @@ namespace InterviewsOrganizer.Services
 
                 // Immediately log the new user in, same as a successful LoginAsync.
                 var tokens = await IssueTokensAsync(user, ct);
+
+                // Dispatch the welcome email on a background task so it never delays the
+                // HTTP response carrying the auto-login tokens. Registration must succeed
+                // regardless of email delivery outcome, so failures are only logged inside
+                // AzureEmailService and never bubble up here.
+                _ = Task.Run(() => _emailService.SendWelcomeEmailAsync(dto.Email, dto.FirstName, CancellationToken.None));
 
                 return AuthResponseDto.Ok(profileDto, tokens);
             }
