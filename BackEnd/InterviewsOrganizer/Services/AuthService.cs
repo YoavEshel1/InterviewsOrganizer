@@ -115,11 +115,7 @@ namespace InterviewsOrganizer.Services
         private async Task<bool> ValidateTurnstileTokenAsync(string? turnstileToken, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(turnstileToken))
-                return false;
-
-            var bypassToken = _configuration["CloudflareTurnstile:BypassToken"];
-            if (!string.IsNullOrEmpty(bypassToken) && turnstileToken == bypassToken)
-                return true;
+                return false;           
 
             var secretKey = _configuration["CloudflareTurnstile:SecretKey"];
             if (string.IsNullOrWhiteSpace(secretKey))
