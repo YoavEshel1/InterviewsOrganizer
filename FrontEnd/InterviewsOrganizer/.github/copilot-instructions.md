@@ -60,3 +60,26 @@ You are an expert Frontend Architect and Angular Specialist focusing on high per
 ## 7. Documentation & Comments Policy
 - **Language**: All code, identifier names, TypeScript interfaces, commit messages, and comments must be written **exclusively in English**.
 - **Self-Documenting Code**: Write expressive, readable code so comments are only needed for complex UI logic or edge-case handling.
+
+### 8. Styling & CSS Architectural Guidelines
+
+8.1. **CSS Hierarchy & Component Nesting**:
+   - Use SASS/SCSS nesting to represent the visual hierarchy:
+     - `.empty-state-wrapper` -> `.guide-card` -> `.hierarchy-tree` -> `.tree-node`.
+   - Maintain a BEM-inspired or clean standard class naming structure (e.g., `.node-card`, `.node-card__icon`, `.node-card__title`).
+   - Limit nesting depth to a maximum of 3 levels to avoid overly specific or fragile selectors.
+
+8.2. **Strict Color Centralization**:
+   - **DO NOT** hardcode hex, rgb, or named colors in the component's SCSS file.
+   - All colors must be imported and referenced via SASS variables or CSS Custom Properties defined in:
+     `FrontEnd\InterviewsOrganizer\src\styles\base\colors.scss`
+   - Use semantic color names from `colors.scss` (e.g., `$color-primary`, `$color-surface`, `$color-text-muted`, `$color-border-subtle`).
+
+8.3. **SCSS Best Practices for Angular 21**:
+   - **Modern SASS Syntax**: Use `@use 'src/styles/base/colors' as colors;` instead of legacy `@import`.
+   - **Responsive & Dynamic Layout**: Use Flexbox and CSS Grid for layout splitting (`sidebar` 320px fixed, `workspace` 1fr grow).
+   - **Elevation & Tokens**: Use centralized shadow tokens or Angular Material elevation helpers (e.g., `@include mat.elevation(...)`) rather than ad-hoc `box-shadow` definitions.
+   - **Encapsulation**: Ensure styles affect only the component host (`:host`) and its scoped HTML template, keeping global overrides strictly inside root style sheets.
+   8.4 **Other CSS Guidelines**
+   - Ensure the component host uses `:host { display: block; width: 100%; }` for proper mobile responsiveness.
+- Apply Accessibility (a11y) best practices: add `aria-label` to icon-only buttons, maintain `:focus-visible` outlines for keyboard navigation, and use semantic HTML elements (`<aside>`, `<main>`).

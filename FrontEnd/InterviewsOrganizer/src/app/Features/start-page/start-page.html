@@ -1,0 +1,28 @@
+<section class="start-page">
+  <mat-card class="start-card">
+    <header class="start-header">
+      <h1 class="start-title">Welcome to Interviews Organizer</h1>
+      <p class="start-subtitle">Keep every application and interview in one organized place.</p>
+    </header>
+
+    <h2 class="guide-title">How it works</h2>
+    <ol class="hierarchy">
+      @for (step of steps; track step.title; let i = $index) {
+      <li class="step" [style.--depth]="i">
+        <span class="step-icon">
+          <mat-icon [svgIcon]="step.icon" />
+        </span>
+        <div class="step-text">
+          <h3>{{ i + 1 }}. {{ step.title }}</h3>
+          <p>{{ step.description }}</p>
+        </div>
+      </li>
+      }
+    </ol>
+
+    <button matButton="filled" type="button" class="cta" (click)="addFirstCompany()">
+      <mat-icon svgIcon="sp-plus" />
+      Add Your First Company
+    </button>
+  </mat-card>
+</section>

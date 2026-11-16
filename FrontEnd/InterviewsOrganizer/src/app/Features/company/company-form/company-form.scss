@@ -1,29 +1,152 @@
-.wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+:host {
+  display: block;
+  height: 100%;
+}
 
+// Soft blue-to-lavender wash that sits well next to the white company list.
+.company-card {
+  width: 640px;
+  height: 100%;
+  max-width: 100%;
+  padding: 32px;
+  border-radius: 20px;
+  border: 1px solid var(--color-border);
+  background: linear-gradient(160deg, #ffffff 0%, #f1f6fd 55%, #f4f1fb 100%);
+  box-shadow: 0 8px 28px rgba(26, 115, 232, 0.08);
+}
 
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  margin-top: 20px;
+}
+
+.brand-badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--color-primary-light), #e4dcf7);
+  color: var(--color-primary-dark);
+
+  mat-icon {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+.card-title {
+  margin: 0 0 4px;
+  font: var(--mat-sys-headline-small);
+  color: var(--color-text-primary);
+}
+
+.card-subtitle {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--color-text-secondary);
+}
+
+.company-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;  
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.positions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 24px;
+}
+
+.positions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  .card-title {
+    margin: 0;
+  }
+}
+
+.positions-hint {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--color-text-secondary);
+}
+
+.position-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.position-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.position-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.position-title {
+  font: var(--mat-sys-title-medium);
+  color: var(--color-text-primary);
+}
+
+.position-date {
+  font: var(--mat-sys-body-small);
+  color: var(--color-text-secondary);
+}
+
+.position-status {
+  flex: none;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font: var(--mat-sys-label-medium);
 }
 
 
-.form-group {  
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+@media (max-width: 480px) {
+  .company-card {
+    padding: 24px 16px;
+  }
 
-    .field {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 5px;
-    }
+  .actions {
+    flex-direction: column-reverse;
 
-    .field:has(input:required) label::after,
-    .field:has(textarea:required) label::after,
-    .field:has(select:required) label::after {
-        content: ' *';
-        color: red;
+    button {
+      width: 100%;
     }
+  }
 }

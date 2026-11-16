@@ -1,0 +1,65 @@
+<mat-card class="position-card">
+    <header class="card-header">
+        <span class="brand-badge">
+            <mat-icon svgIcon="sp-position" />
+        </span>
+        <div>
+            <h3 class="card-title">New position</h3>
+            <p class="card-subtitle">Which role are you applying for?</p>
+        </div>
+    </header>
+
+    <form class="position-form" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+        <mat-form-field appearance="outline">
+            <mat-label>Job title</mat-label>
+            <input matInput type="text" formControlName="title" />
+            @if (form.controls.title.hasError('required')) {
+            <mat-error>Job title is required</mat-error>
+            } @else if (form.controls.title.hasError('maxlength')) {
+            <mat-error>Job title can be at most 200 characters</mat-error>
+            }
+        </mat-form-field>
+
+        <div class="row">
+            <mat-form-field appearance="outline">
+                <mat-label>Apply date</mat-label>
+                <input matInput [matDatepicker]="applyPicker" formControlName="applyDate" />
+                <mat-datepicker-toggle matIconSuffix [for]="applyPicker" />
+                <mat-datepicker #applyPicker />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status">
+                    @for (option of statusOptions; track option.value) {
+                    <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Notes</mat-label>
+            <textarea matInput rows="3" formControlName="notes"></textarea>
+            @if (form.controls.notes.hasError('maxlength')) {
+            <mat-error>Notes can be at most 2000 characters</mat-error>
+            }
+        </mat-form-field>
+
+        @if (errorMessage()) {
+        <div class="form-error" role="alert">{{ errorMessage() }}</div>
+        }
+
+        <div class="actions">
+            <button matButton="outlined" type="button" [disabled]="saving()" (click)="cancelled.emit()">Cancel</button>
+            <button matButton="filled" type="submit" [disabled]="saving()">
+                @if (saving()) {
+                <mat-spinner diameter="20" />
+                <span>Saving...</span>
+                } @else {
+                <span>Save position</span>
+                }
+            </button>
+        </div>
+    </form>
+</mat-card>

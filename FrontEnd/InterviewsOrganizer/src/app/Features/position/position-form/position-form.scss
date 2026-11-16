@@ -1,0 +1,91 @@
+:host {
+  display: block;
+}
+
+// Mirrors the company card, with the gradient flipped so the nested card reads as a separate layer.
+.position-card {
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  background: linear-gradient(160deg, #ffffff 0%, #f6f3fc 55%, #eef5fd 100%);
+  box-shadow: 0 6px 20px rgba(110, 90, 190, 0.08);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.brand-badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #e4dcf7, var(--color-primary-light));
+  color: var(--color-primary-dark);
+}
+
+.card-title {
+  margin: 0 0 2px;
+  font: var(--mat-sys-title-large);
+  color: var(--color-text-primary);
+}
+
+.card-subtitle {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--color-text-secondary);
+}
+
+.position-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 12px;
+}
+
+.form-error {
+  margin-bottom: 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: var(--color-error-light);
+  color: var(--color-error);
+  font: var(--mat-sys-body-medium);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+
+  button span,
+  button mat-spinner {
+    vertical-align: middle;
+  }
+}
+
+@media (max-width: 480px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+}

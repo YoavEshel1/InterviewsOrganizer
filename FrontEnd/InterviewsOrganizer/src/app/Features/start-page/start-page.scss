@@ -1,0 +1,106 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.start-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  padding: 24px 16px;
+}
+
+.start-card {
+  width: 100%;
+  max-width: 620px;
+  padding: 40px 32px 32px;
+  border-radius: 24px;
+}
+
+.start-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.start-title {
+  margin: 0 0 8px;
+  font: var(--mat-sys-headline-medium);
+  color: var(--mat-sys-on-surface);
+}
+
+.start-subtitle {
+  margin: 0;
+  font: var(--mat-sys-body-large);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.guide-title {
+  margin: 0 0 12px;
+  font: var(--mat-sys-title-medium);
+  color: var(--mat-sys-on-surface);
+}
+
+.hierarchy {
+  list-style: none;
+  margin: 0 0 32px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// Each level is indented further to show that it lives inside the previous one.
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-left: calc(var(--depth, 0) * 24px);
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--mat-sys-surface-container);
+  border-left: 4px solid var(--mat-sys-primary);
+}
+
+.step-icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+}
+
+.step-text {
+  h3 {
+    margin: 0 0 4px;
+    font: var(--mat-sys-title-medium);
+    color: var(--mat-sys-on-surface);
+  }
+
+  p {
+    margin: 0;
+    font: var(--mat-sys-body-medium);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.cta {
+  display: flex;
+  width: 100%;
+  height: 52px;
+  font: var(--mat-sys-title-medium);
+}
+
+@media (max-width: 480px) {
+  .start-card {
+    padding: 28px 16px 20px;
+  }
+
+  .step {
+    margin-left: calc(var(--depth, 0) * 12px);
+  }
+}

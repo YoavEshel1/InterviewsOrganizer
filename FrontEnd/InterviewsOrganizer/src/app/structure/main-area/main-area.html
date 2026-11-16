@@ -1,8 +1,16 @@
+@if (showStartPage()) {
+<app-start-page />
+} @else {
 <div class="main-area">
     <div>
         <app-company-list></app-company-list>
     </div>
     <div>
+        @if (isCreatingCompany()) {
+        <app-company-form></app-company-form>
+        } @else {
         <router-outlet></router-outlet>
+        }
     </div>
 </div>
+}

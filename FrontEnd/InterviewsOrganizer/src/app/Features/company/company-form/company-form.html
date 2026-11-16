@@ -1,35 +1,72 @@
-<div class="wrapper">
-    <div class="instructions-row">
-        <div>Manage company details, positions, and interview history.</div>
-        <div class="top-buttons">
-            <button class="btn btn--ghost" (click)="cancel()">Cancel</button>
-            <button class="btn btn--primary" (click)="saveChanges()">Save Changes</button>
+<mat-card class="company-card">
+    <div class="actions">
+        <button matButton="outlined" type="button" (click)="cancel()">Cancel</button>
+        <button matButton="filled" type="button" (click)="saveChanges()">Save changes</button>
+    </div>
+
+
+    <header class="card-header">
+        <span class="brand-badge">
+            <mat-icon svgIcon="sp-company" />
+        </span>
+        <div class="card-heading">
+            <h2 class="card-title">{{ isCreating() ? 'New company' : 'Company details' }}</h2>
+            <p class="card-subtitle">Manage company details, positions, and interview history.</p>
         </div>
-    </div>
+    </header>
 
-    <hr>
+    <form class="company-form" [formGroup]="form" (ngSubmit)="saveChanges()" novalidate>
+        <mat-form-field appearance="outline">
+            <mat-label>Company name</mat-label>
+            <input matInput type="text" formControlName="name" autocomplete="organization" />
+            @if (form.controls.name.hasError('required')) {
+            <mat-error>Company name is required</mat-error>
+            }
+        </mat-form-field>
 
-    <!-- Company Details Form -->
-    <div class="company-details">
-        <h2>Company Details</h2>
-        <form [formGroup]="form" (ngSubmit)="saveChanges()">
-            <div class="form-group">
-                <div class="field">
-                    <label for="companyName">Company Name</label>
-                    <input type="text" id="companyName" name="companyName" 
-                    class="form-control" formControlName="name"
-                        placeholder="Company name">
-                    @if (isInvalid('name')) {
-                    <span class="cf-error">Company name is required</span>
+        <mat-form-field appearance="outline">
+            <mat-label>Company info</mat-label>
+            <textarea matInput rows="4" formControlName="companyInfo" placeholder="Enter company info"></textarea>
+            <mat-hint>What do they do? Anything worth remembering.</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>URL</mat-label>
+            <input matInput type="url" formControlName="logoUrl" />
+        </mat-form-field>
+        
+    </form>
+
+    <div class="positions">
+        <div class="positions-header">
+            <h2 class="card-title">Positions</h2>
+            <button matButton="filled" type="button" [disabled]="!canAddPosition() || showPositionForm()"
+                (click)="addPosition()">Add position</button>
+        </div>
+
+        @if (!canAddPosition()) {
+        <p class="positions-hint">Save the company first, then you can add positions to it.</p>
+        }
+
+        @if (showPositionForm() && company(); as selected) {
+        <app-position-form [companyId]="selected.id" (saved)="onPositionSaved($event)"
+            (cancelled)="showPositionForm.set(false)" />
+        }
+
+        @if (company()?.positions?.length) {
+        <ul class="position-list">
+            @for (position of company()!.positions; track position.id) {
+            <li class="position-item">
+                <div class="position-main">
+                    <span class="position-title">{{ position.title }}</span>
+                    @if (position.applyDate) {
+                    <span class="position-date">Applied {{ position.applyDate | date: 'mediumDate' }}</span>
                     }
-
                 </div>
-                <div class="field">
-                    <label for="company-info">Company Info</label>
-                    <textarea id="company-info" name="company-info" class="form-control" formControlName="companyInfo"
-                        placeholder="Company info"></textarea>
-                </div>
-
-            </div>
-        </form>
+                <span class="position-status">{{ statusLabel(position.status) }}</span>
+            </li>
+            }
+        </ul>
+        }
     </div>
+</mat-card>

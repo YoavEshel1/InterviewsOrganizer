@@ -1,11 +1,27 @@
-<div class="container">
+<aside class="companies-sidebar" aria-label="Companies management">
+
+    <header class="sidebar-header">
+        <button matButton="filled" type="button" class="add-company" [disabled]="isCreatingCompany()"
+            (click)="addCompany()" aria-label="Add new company">
+            Add company
+        </button>
+    </header>
+
     @if (loadingCompanies()) {
-    <p>Loading companies...</p>
-    } @else {
-    <div cdkDropList class="company-list" (cdkDropListDropped)="drop($event)">
-        @for (company of companies(); track company.id) {
-         <app-company-item [company]="company" class="company-box"></app-company-item>
-        }
+    <div class="loading-state" role="status" aria-live="polite">
+        <p>Loading companies...</p>
     </div>
+    } @else {
+    @if (companies().length > 0) {
+    <ul cdkDropList class="company-list" (cdkDropListDropped)="drop($event)" role="list" aria-label="Companies list">
+
+        @for (company of companies(); track company.id) {
+        <li class="company-item-wrapper">
+            <app-company-item [company]="company" class="company-box"></app-company-item>
+        </li>
+        }
+    </ul>
     }
-</div>          
+    }
+
+</aside>
