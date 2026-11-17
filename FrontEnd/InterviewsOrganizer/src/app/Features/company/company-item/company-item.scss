@@ -16,6 +16,11 @@
     font-size: 14px;
     font-family: sans-serif;
     min-height: 93px;
+
+    &.selected {
+        border-color: var(--color-primary);
+        background: var(--color-item-selected-bg);
+    }
 }
 
 .drag-handle {

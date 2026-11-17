@@ -1,4 +1,4 @@
-<div class="item" cdkDrag (click)="selectCompany()">
+<div class="item" cdkDrag (click)="selectCompany()" [class.selected]="isSelected()">
     <div class="drag-handle" cdkDragHandle title="Drag to reorder" (click)="$event.stopPropagation()">&#9776;</div>
     <div>
         <img [src]="company().logoUrl" alt="{{ company().name }} logo" class="company-logo">
@@ -9,9 +9,6 @@
             company().positions[0]?.title : 'No positions defined' }}
         </div>
         <div>{{ company().companyInfo }}</div>
-    </div>
-    <div>
-        <button *ngIf="isSelected()" class="btn btn--ghost" (click)="editCompany()">Edit</button>
-    </div>
+    </div>   
 
 </div>
