@@ -2,7 +2,9 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { By } from '@angular/platform-browser';
 import { CompanyService } from '../companyService';
+import { PositionArea } from '../../position/position-area/position-area';
 import { CompanyForm } from './company-form';
 
 describe('CompanyForm', () => {
@@ -66,11 +68,6 @@ describe('CompanyForm', () => {
     const company = { id: 'c1', name: 'Acme', positions: [] };
     const position = { id: 'p1', title: 'Engineer', companyId: 'c1', applyDate: '2026-11-11', status: 0 as const };
 
-    function addPositionButton(fixture: ComponentFixture<CompanyForm>): HTMLButtonElement {
-      const buttons: HTMLButtonElement[] = Array.from(fixture.nativeElement.querySelectorAll('.positions button'));
-      return buttons.find((b) => b.textContent?.includes('Add position'))!;
-    }
-
     function createFixture(): ComponentFixture<CompanyForm> {
       TestBed.configureTestingModule({
         imports: [CompanyForm],
@@ -83,41 +80,27 @@ describe('CompanyForm', () => {
       return fixture;
     }
 
-    it('keeps Add position disabled until a saved company is selected', () => {
+    it('passes the selected company ID to PositionArea', () => {
       const fixture = createFixture();
-      expect(addPositionButton(fixture).disabled).toBe(true);
-
       service.selectCompany(company);
       fixture.detectChanges();
-      expect(addPositionButton(fixture).disabled).toBe(false);
+
+      const area = fixture.debugElement.query(By.directive(PositionArea)).componentInstance as PositionArea;
+      expect(area.companyId()).toBe('c1');
       http.match('/api/companies');
+      http.match('/api/companies/c1/positions').forEach((request) => request.flush([]));
     });
 
-    it('shows the position form under the button when clicked', () => {
+    it('updates the selected company when PositionArea emits a saved position', () => {
       const fixture = createFixture();
       service.selectCompany(company);
       fixture.detectChanges();
-      expect(fixture.nativeElement.querySelector('app-position-form')).toBeNull();
 
-      addPositionButton(fixture).click();
-      fixture.detectChanges();
-
-      expect(fixture.nativeElement.querySelector('app-position-form')).not.toBeNull();
-      http.match('/api/companies');
-    });
-
-    it('lists the saved position and closes the form', () => {
-      const fixture = createFixture();
-      service.selectCompany(company);
-      fixture.componentInstance.addPosition();
-
-      fixture.componentInstance.onPositionSaved(position);
-      fixture.detectChanges();
-
-      expect(fixture.componentInstance.showPositionForm()).toBe(false);
-      expect(fixture.nativeElement.querySelector('.position-item')?.textContent).toContain('Engineer');
+      const area = fixture.debugElement.query(By.directive(PositionArea)).componentInstance as PositionArea;
+      area.saved.emit(position);
       expect(service.selectedCompany()?.positions).toEqual([position]);
       http.match('/api/companies');
+      http.match('/api/companies/c1/positions').forEach((request) => request.flush([]));
     });
   });
 });

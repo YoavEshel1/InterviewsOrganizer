@@ -37,36 +37,5 @@
         
     </form>
 
-    <div class="positions">
-        <div class="positions-header">
-            <h2 class="card-title">Positions</h2>
-            <button matButton="filled" type="button" [disabled]="!canAddPosition() || showPositionForm()"
-                (click)="addPosition()">Add position</button>
-        </div>
-
-        @if (!canAddPosition()) {
-        <p class="positions-hint">Save the company first, then you can add positions to it.</p>
-        }
-
-        @if (showPositionForm() && company(); as selected) {
-        <app-position-form [companyId]="selected.id" (saved)="onPositionSaved($event)"
-            (cancelled)="showPositionForm.set(false)" />
-        }
-
-        @if (company()?.positions?.length) {
-        <ul class="position-list">
-            @for (position of company()!.positions; track position.id) {
-            <li class="position-item">
-                <div class="position-main">
-                    <span class="position-title">{{ position.title }}</span>
-                    @if (position.applyDate) {
-                    <span class="position-date">Applied {{ position.applyDate | date: 'mediumDate' }}</span>
-                    }
-                </div>
-                <span class="position-status">{{ statusLabel(position.status) }}</span>
-            </li>
-            }
-        </ul>
-        }
-    </div>
+    <app-position-area [companyId]="company()?.id ?? ''" (saved)="onPositionSaved($event)" />
 </mat-card>

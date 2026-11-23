@@ -1,5 +1,4 @@
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { Component, effect, inject } from '@angular/core';
 import { Company } from '../../models/company';
 import { CompanyService } from '../companyService';
 import { FormArray,  FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,10 +9,10 @@ import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Interview } from '../../models/interview';
-import { Position, positionStatusLabel } from '../../models/position';
-import { PositionForm } from '../../position/position-form/position-form';
+import { Position } from '../../models/position';
 import { ActivatedRoute } from '@angular/router';
 import { START_PAGE_ICONS } from '../../start-page/start-page-icons';
+import { PositionArea } from '../../position/position-area/position-area';
 
 @Component({
   selector: 'app-company-form',
@@ -24,8 +23,7 @@ import { START_PAGE_ICONS } from '../../start-page/start-page-icons';
     MatButtonModule,
     MatCardModule,
     MatIconModule,
-    PositionForm,
-    DatePipe,
+    PositionArea,
   ],
   templateUrl: './company-form.html',
   styleUrl: './company-form.scss',
@@ -34,8 +32,6 @@ export class CompanyForm {
 
   companyService = inject(CompanyService);
   isCreating = this.companyService.isCreatingCompany;
-  showPositionForm = signal(false);
-  protected readonly statusLabel = positionStatusLabel;
   private fb = inject(FormBuilder);
 
   form = this.fb.group({
@@ -46,9 +42,6 @@ export class CompanyForm {
   });
 
   company = this.companyService.selectedCompany;
-  private selectedCompanyId = computed(() => this.company()?.id);
-  /** Positions belong to a saved company, so the button stays disabled until the company has an id. */
-  canAddPosition = computed(() => !!this.company()?.id && !this.isCreating());
   get positions(): FormArray {
     return this.form.get('positions') as FormArray;
   }
@@ -88,11 +81,6 @@ export class CompanyForm {
       }
     });
 
-    // Switching to another company closes any open position form.
-    effect(() => {
-      this.selectedCompanyId();
-      untracked(() => this.showPositionForm.set(false));
-    });
   }
 
   private resetForm() {
@@ -147,16 +135,8 @@ private makeInterviewGroup(i: Interview): FormGroup {
   });
 }
 
-//add remove
-addPosition(): void {
-  if (this.canAddPosition()) {
-    this.showPositionForm.set(true);
-  }
-}
-
 onPositionSaved(position: Position): void {
   this.companyService.addPositionToCompany(position.companyId || this.company()!.id, position);
-  this.showPositionForm.set(false);
 }
 
 removePosition(index: number): void {
@@ -187,7 +167,6 @@ removeInterview(positionIndex: number, interviewIndex: number): void {
     } as Company);
   }
   cancel() {
-    this.showPositionForm.set(false);
     this.companyService.clearSelection();
     this.companyService.stopCreatingCompany();
   }

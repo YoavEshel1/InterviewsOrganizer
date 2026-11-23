@@ -1,0 +1,27 @@
+<div class="positions">
+  <div class="positions-header">
+    <h2 class="card-title">Positions</h2>
+    <button
+      matButton="filled"
+      type="button"
+      [disabled]="!canAddPosition() || showPositionForm()"
+      (click)="addPosition()"
+    >
+      Add position
+    </button>
+  </div>
+
+  @if (!canAddPosition()) {
+    <p class="positions-hint">Save the company first, then you can add positions to it.</p>
+  } @else {
+    @if (showPositionForm()) {
+      <app-position-form
+        [companyId]="companyId()"
+        (saved)="onPositionSaved($event)"
+        (cancelled)="showPositionForm.set(false)"
+      />
+    }
+
+    <app-position-list [companyId]="companyId()" />
+  }
+</div>
