@@ -1,7 +1,7 @@
 import { Component, effect, inject } from '@angular/core';
 import { Company } from '../../models/company';
 import { CompanyService } from '../companyService';
-import { FormArray,  FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -104,57 +104,57 @@ export class CompanyForm {
     }
   }
 
-   /** Was a top-level field touched and is invalid? */
+  /** Was a top-level field touched and is invalid? */
   isInvalid(field: string): boolean {
     const ctrl = this.form.get(field);
     return !!(ctrl?.invalid && ctrl.touched);
   }
 
   private makePositionGroup(p: Position): FormGroup {
-  const group = this.fb.group({
-    id:        [p.id],
-    title:     [p.title,     Validators.required],
-    applyDate: [p.applyDate, Validators.required],
-    status:    [p.status,    Validators.required],
-    notes:     [p.notes],
-    interviews: this.fb.array(
-      (p.interviews ?? []).map(i => this.makeInterviewGroup(i))
-    ),
-  });
+    const group = this.fb.group({
+      id: [p.id],
+      title: [p.title, Validators.required],
+      applyDate: [p.applyDate, Validators.required],
+      status: [p.status, Validators.required],
+      notes: [p.notes],
+      interviews: this.fb.array(
+        (p.interviews ?? []).map(i => this.makeInterviewGroup(i))
+      ),
+    });
 
-  return group;
-}
+    return group;
+  }
 
-private makeInterviewGroup(i: Interview): FormGroup {
-  return this.fb.group({
-    id:              [i.id],
-    date:        [i.date,        Validators.required],
-    feeling:         [i.feeling,         Validators.required],
-    interviewer: [i.interviewer],
-    notes:           [i.notes],
-  });
-}
+  private makeInterviewGroup(i: Interview): FormGroup {
+    return this.fb.group({
+      id: [i.id],
+      date: [i.date, Validators.required],
+      feeling: [i.feeling, Validators.required],
+      interviewer: [i.interviewer],
+      notes: [i.notes],
+    });
+  }
 
-onPositionSaved(position: Position): void {
-  this.companyService.addPositionToCompany(position.companyId || this.company()!.id, position);
-}
+  onPositionSaved(position: Position): void {
+    this.companyService.addPositionToCompany(position.companyId || this.company()!.id, position);
+  }
 
-removePosition(index: number): void {
-  this.positions.removeAt(index);
-}
+  removePosition(index: number): void {
+    this.positions.removeAt(index);
+  }
 
-addInterview(positionIndex: number): void {
-  //TODO: call the server to create the interview and get the id and date back
-  // this.getInterviews(positionIndex).push(this.makeInterviewGroup({        
-  //   feeling:         2,
-  //   interviewer: '',
-  //   notes:           '',
-  // }));
-}
+  addInterview(positionIndex: number): void {
+    //TODO: call the server to create the interview and get the id and date back
+    // this.getInterviews(positionIndex).push(this.makeInterviewGroup({        
+    //   feeling:         2,
+    //   interviewer: '',
+    //   notes:           '',
+    // }));
+  }
 
-removeInterview(positionIndex: number, interviewIndex: number): void {
-  this.getInterviews(positionIndex).removeAt(interviewIndex);
-}
+  removeInterview(positionIndex: number, interviewIndex: number): void {
+    this.getInterviews(positionIndex).removeAt(interviewIndex);
+  }
 
   saveChanges() {
     if (this.form.invalid) {
@@ -165,8 +165,21 @@ removeInterview(positionIndex: number, interviewIndex: number): void {
       id: this.companyService.selectedCompany()?.id,
       ...this.form.getRawValue(),
     } as Company);
+    this.form.markAsPristine();
   }
-  cancel() {
+
+  cancel(): void {
+    const selectedCompany = this.company();
+
+    if (selectedCompany) {
+      this.rebuildForm(selectedCompany);
+      this.form.markAsPristine();
+      this.form.markAsUntouched();
+      return;
+    }
+
+    // Canceling a new company form
+    this.resetForm();
     this.companyService.clearSelection();
     this.companyService.stopCreatingCompany();
   }

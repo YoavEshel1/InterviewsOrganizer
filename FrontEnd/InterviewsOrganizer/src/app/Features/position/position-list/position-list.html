@@ -1,13 +1,11 @@
 <ul class="position-list">
     @for (position of positions.value(); track position.id) {
-    <li class="position-item">
-        <div class="position-main">
-            <span class="position-title">{{ position.title }}</span>
-            @if (position.applyDate) {
-            <span class="position-date">Applied {{ position.applyDate | date: 'mediumDate' }}</span>
-            }
-        </div>
-        <span class="position-status">{{ statusLabel(position.status) }}</span>
-    </li>
+      <li>
+        <app-position-item
+          [position]="position"
+          [selected]="selectedPositionId() === position.id"
+          (positionSelected)="selectPosition($event)"
+        />
+      </li>
     }
 </ul>

@@ -1,7 +1,7 @@
 <mat-card class="company-card">
     <div class="actions">
-        <button matButton="outlined" type="button" (click)="cancel()">Cancel</button>
-        <button matButton="filled" type="button" (click)="saveChanges()">Save changes</button>
+        <button matButton="outlined" type="button" [disabled]="!form.dirty" (click)="cancel()">Cancel</button>
+        <button matButton="filled" type="button" [disabled]="!form.dirty" (click)="saveChanges()">Save changes</button>
     </div>
 
 

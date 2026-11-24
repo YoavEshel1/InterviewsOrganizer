@@ -1,0 +1,7 @@
+<div class="position-main">
+  <span class="position-title">{{ position().title }}</span>
+  @if (position().applyDate) {
+    <span class="position-date">Applied {{ position().applyDate | date: 'mediumDate' }}</span>
+  }
+</div>
+<span class="position-status">{{ statusLabel(position().status) }}</span>

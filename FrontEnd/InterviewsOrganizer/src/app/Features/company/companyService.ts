@@ -45,7 +45,7 @@ export class CompanyService {
  save(company: Company) {
     const isEdit = Boolean(company.id);
     const request$ = isEdit
-      ? this.http.put<Company>(`${this.companiesUrl}/${company.id}`, company)
+      ? this.http.put<Company>(`${this.companiesUrl}`, company)
       : this.http.post<Company>(this.companiesUrl, company);
 
     request$.pipe(

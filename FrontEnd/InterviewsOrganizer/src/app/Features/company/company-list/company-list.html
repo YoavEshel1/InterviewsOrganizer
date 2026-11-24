@@ -13,7 +13,9 @@
     </div>
     } @else {
     @if (companies().length > 0) {
-    <ul cdkDropList class="company-list" (cdkDropListDropped)="drop($event)" role="list" aria-label="Companies list">
+    <ul cdkDropList class="company-list" 
+    (cdkDropListDropped)="drop($event)"
+     role="list" aria-label="Companies list">
 
         @for (company of companies(); track company.id) {
         <li class="company-item-wrapper">
